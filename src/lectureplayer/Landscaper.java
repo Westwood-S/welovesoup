@@ -10,6 +10,14 @@ public class Landscaper extends Unit {
     public void takeTurn() throws GameActionException {
         super.takeTurn();
 
+        // first, save HQ by trying to remove dirt from it
+        if (hqLoc != null && hqLoc.isAdjacentTo(rc.getLocation())) {
+            Direction dirtohq = rc.getLocation().directionTo(hqLoc);
+            if(rc.canDigDirt(dirtohq)){
+                rc.digDirt(dirtohq);
+            }
+        }
+
         if(rc.getDirtCarrying() == 0){
             tryDig();
         }
@@ -30,7 +38,7 @@ public class Landscaper extends Unit {
             }
         }
 
-        if (Math.random() < 0.4){
+        if (Math.random() < 0.8){
             // build the wall
             if (bestPlaceToBuildWall != null) {
                 rc.depositDirt(rc.getLocation().directionTo(bestPlaceToBuildWall));
@@ -48,7 +56,12 @@ public class Landscaper extends Unit {
     }
 
     boolean tryDig() throws GameActionException {
-        Direction dir = Util.randomDirection();
+        Direction dir;
+        if(hqLoc == null){
+            dir = Util.randomDirection();
+        } else {
+            dir = hqLoc.directionTo(rc.getLocation());
+        }
         if(rc.canDigDirt(dir)){
             rc.digDirt(dir);
             rc.setIndicatorDot(rc.getLocation().add(dir), 255, 0, 0);
