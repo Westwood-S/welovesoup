@@ -21,7 +21,7 @@ src/lectureplayer
 *.ipr
 *.iws
 /.idea/
-
+/Battlecode Client.exe/
 
 
 # User-specific stuff:
