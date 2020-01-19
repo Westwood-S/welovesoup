@@ -10,16 +10,21 @@ public class Landscaper extends Unit {
     public void takeTurn() throws GameActionException {
         super.takeTurn();
 
-        if(rc.getDirtCarrying() == 0){
-            //for (Direction dir : Util.directions)
-                tryDig(Util.randomDirection());
+        if (hqLoc != null && hqLoc.isAdjacentTo(rc.getLocation())) {
+            Direction dirtohq = rc.getLocation().directionTo(hqLoc);
+            if(rc.canDigDirt(dirtohq)){
+                rc.digDirt(dirtohq);
+            }
+        }
 
+        if(rc.getDirtCarrying() == 0){
+            tryDig();
         }
 
         MapLocation bestPlaceToBuildWall = null;
+        // find best place to build
         if(hqLoc != null) {
             int lowestElevation = 9999999;
-            //MapLocation[] tileNearHQ = {hqLoc.add(Direction.NORTHWEST).add(Direction.NORTHWEST),hqLoc.add(Direction.NORTHWEST).add(Direction.NORTH),hqLoc.add(Direction.NORTH).add(Direction.NORTH),hqLoc.add(Direction.NORTHEAST).add(Direction.NORTH),hqLoc.add(Direction.NORTHEAST).add(Direction.NORTHEAST),hqLoc.add(Direction.EAST).add(Direction.EAST),hqLoc.add(Direction.SOUTHEAST).add(Direction.SOUTHEAST),hqLoc.add(Direction.SOUTH).add(Direction.SOUTH),hqLoc.add(Direction.SOUTHWEST).add(Direction.SOUTHWEST),hqLoc.add(Direction.WEST).add(Direction.WEST)};
             for (Direction dir : Util.directions) {
                 MapLocation tileToCheck = hqLoc.add(dir);
                 if(rc.getLocation().distanceSquaredTo(tileToCheck) < 4
@@ -32,11 +37,12 @@ public class Landscaper extends Unit {
             }
         }
 
-        if (Math.random() < 0.4){
+        if (Math.random() < 0.5){
             // build the wall
             if (bestPlaceToBuildWall != null) {
                 rc.depositDirt(rc.getLocation().directionTo(bestPlaceToBuildWall));
                 rc.setIndicatorDot(bestPlaceToBuildWall, 0, 255, 0);
+                System.out.println("building a wall");
             }
         }
 
@@ -47,10 +53,15 @@ public class Landscaper extends Unit {
             nav.goTo(Util.randomDirection());
         }
 
-
     }
 
-    boolean tryDig(Direction dir) throws GameActionException {
+    boolean tryDig() throws GameActionException {
+        Direction dir;
+        if(hqLoc == null){
+            dir = Util.randomDirection();
+        } else {
+            dir = hqLoc.directionTo(rc.getLocation());
+        }
         if(rc.canDigDirt(dir)){
             rc.digDirt(dir);
             rc.setIndicatorDot(rc.getLocation().add(dir), 255, 0, 0);

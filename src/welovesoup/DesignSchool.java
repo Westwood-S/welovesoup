@@ -2,6 +2,9 @@ package welovesoup;
 import battlecode.common.*;
 
 public class DesignSchool extends Building {
+
+    int numLandScapers=0;
+
     public DesignSchool(RobotController r) {
         super(r);
     }
@@ -12,10 +15,11 @@ public class DesignSchool extends Building {
         // will only actually happen if we haven't already broadcasted the creation
         comms.broadcastDesignSchoolCreation(rc.getLocation());
 
-        for (Direction dir : Util.directions) {
-            if(tryBuild(RobotType.LANDSCAPER, dir)) {
-                System.out.println("made a landscaper");
-            }
-        }
+        if (numLandScapers<3)
+            for (Direction dir : Util.directions) 
+                if(tryBuild(RobotType.LANDSCAPER, dir)) {
+                    numLandScapers++;
+                }
+            
     }
 }
