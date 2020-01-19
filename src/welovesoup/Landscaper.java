@@ -15,6 +15,8 @@ public class Landscaper extends Unit {
             if(rc.canDigDirt(dirtohq)){
                 rc.digDirt(dirtohq);
             }
+        } else {
+            nav.goTo(hqLoc);
         }
 
         if(rc.getDirtCarrying() == 0){
@@ -47,11 +49,11 @@ public class Landscaper extends Unit {
         }
 
         // otherwise try to get to the hq
-        if(hqLoc != null){
-            nav.goTo(hqLoc);
-        } else {
-            nav.goTo(Util.randomDirection());
-        }
+//        if(hqLoc != null){
+//            nav.goTo(hqLoc);
+//        } else {
+//            nav.goTo(Util.randomDirection());
+//        }
 
     }
 

@@ -24,11 +24,14 @@ public class Miner extends Unit {
         soupLocations.addAll(Arrays.asList(rc.senseNearbySoup()));
         comms.updateSoupLocations(soupLocations);
         comms.updateRefnyLocations(refineryLocations);
+        comms.updateVaporatorLocations(vaporatorLocations);
+        System.out.println("Vaporator Locations:" + vaporatorLocations);
         checkSoup();
         checkRefny();
 
-        //Experimenting with vaporators.... It creates one. We can turn off all the others.
-        
+        Direction randomDir = Util.randomDirection();
+//---------------------------------------Trying to build------------------------------------
+//Refinery
         if (turnCount>230) {
             if (refineryLocations.size()<1)
                 for (Direction dir : Util.directions)
@@ -37,19 +40,31 @@ public class Miner extends Unit {
                         comms.broadcastRefnyLocation(refnyLoc);
                     }
         }
-
-        if(turnCount>250 && vaporatorLocations.size() == 0){
+//Vaporator
+        if(turnCount>250 && vaporatorLocations.size() == 0) {
             System.out.println("Trying to build vaporator");
-            if(tryBuild(RobotType.VAPORATOR, Util.randomDirection()))
+            if (tryBuild(RobotType.VAPORATOR, randomDir)) {
                 System.out.println("Created a Vaporator");
+                MapLocation VapeLoc = rc.getLocation().add(randomDir);
+                comms.broadcastVaporatorLocation(VapeLoc);
+            }
+        }
+//Design school
+
+        if (turnCount>180 && numDesignSchools == 0 && rc.getLocation().distanceSquaredTo(hqLoc)>3) {
+            if(tryBuild(RobotType.DESIGN_SCHOOL, randomDir))
+                System.out.println("created a design school");
         }
 
+//----------------------------------Searching for --------------------------------
+ //Refinery
         for (Direction dir : Util.directions)
             if (tryRefine(dir)){
                 MapLocation refnyLoc = rc.getLocation().add(dir);
                 if (!refineryLocations.contains(refnyLoc) && refnyLoc != hqLoc)
                     comms.broadcastRefnyLocation(refnyLoc);
             }
+//Soup
         for (Direction dir : Util.directions)
             if (tryMine(dir)) {
                 MapLocation soupLoc = rc.getLocation().add(dir);
@@ -57,11 +72,7 @@ public class Miner extends Unit {
                     comms.broadcastSoupLocation(soupLoc);
             }
 
-        if (turnCount>180 && numDesignSchools < 3) {
-            if(tryBuild(RobotType.DESIGN_SCHOOL, Util.randomDirection()))
-                System.out.println("created a design school");
-        }
-
+//------------------------------Full of Soup-----------------------------------
         if (rc.getSoupCarrying() == RobotType.MINER.soupLimit) {
             // time to go back to the HQ
             if (numDesignSchools==0 || refineryLocations.size()==0)
@@ -70,12 +81,12 @@ public class Miner extends Unit {
             else if (refineryLocations.size() > 0)
                 nav.goTo(refineryLocations.get(0));
             else 
-                if (nav.goTo(Util.randomDirection()))
+                if (nav.goTo(randomDir))
                     System.out.println("I moved randomly!");
 
         } else if (soupLocations.size() > 0) {
             nav.goTo(soupLocations.get(0));
-        } else if (nav.goTo(Util.randomDirection())) {
+        } else if (nav.goTo(randomDir)) {
             // otherwise, move randomly as usual
             System.out.println("I moved randomly!");
         }
