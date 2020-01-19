@@ -68,7 +68,7 @@ public class Communications {
 
         int[] message = new int[7];
         message[0] = teamSecret;
-        message[1] = 1;
+        message[1] = 4;
         message[2] = loc.x; // x coord of HQ
         message[3] = loc.y; // y coord of HQ
         if (rc.canSubmitTransaction(message, 3)) {
@@ -95,8 +95,8 @@ public class Communications {
         int count = 0;
         for(Transaction tx : rc.getBlock(rc.getRoundNum() - 1)) {
             int[] mess = tx.getMessage();
-            if(mess[0] == teamSecret && mess[4] == 4) {
-                System.out.println("heard about a cool new school");
+            if(mess[0] == teamSecret && mess[1] == 4) {
+                System.out.println("heard about a cool new fulfillment center");
                 count += 1;
             }
         }
