@@ -1,12 +1,16 @@
 package welovesoup;
 import battlecode.common.*;
+
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 
 public class Miner extends Unit {
 
     int numDesignSchools = 0;
     ArrayList<MapLocation> refineryLocations = new ArrayList<MapLocation>();
+    ArrayList<MapLocation> vaporatorLocations = new ArrayList<>();
     ArrayList<MapLocation> soupLocations = new ArrayList<MapLocation>();
 
     public Miner(RobotController r) {
@@ -15,15 +19,21 @@ public class Miner extends Unit {
 
     public void takeTurn() throws GameActionException {
         super.takeTurn();
-
+        soupLocations.addAll(Arrays.asList(rc.senseNearbySoup()));
         numDesignSchools += comms.getNewDesignSchoolCount();
         comms.updateSoupLocations(soupLocations);
         comms.updateRefnyLocations(refineryLocations);
         checkSoup();
         checkRefny();
 
+        //Experimenting with vaporators.... It creates one. We can turn off all the others.
+//        if(turnCount>250 && vaporatorLocations.size() == 0){
+//            System.out.println("Trying to build vaporator");
+//            if(tryBuild(RobotType.VAPORATOR, Util.randomDirection()))
+//                System.out.println("Created a Vaporator");
+//        }
         if (turnCount>200) {
-            if (rc.getLocation().distanceSquaredTo(hqLoc)>100 && refineryLocations.size()<5)
+            if (rc.getLocation().distanceSquaredTo(hqLoc)>45 && refineryLocations.size()<1)
                     if(tryBuild(RobotType.REFINERY, Util.randomDirection()))
                         System.out.println("created a refinery");
         }
@@ -42,8 +52,6 @@ public class Miner extends Unit {
 
                 
             }
-
-        
 
         if (turnCount>230 && numDesignSchools < 3) {
             if(tryBuild(RobotType.DESIGN_SCHOOL, Util.randomDirection()))
