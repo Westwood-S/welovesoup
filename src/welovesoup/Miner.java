@@ -24,10 +24,10 @@ public class Miner extends Unit {
         checkSoup();
 
         for (Direction dir : Util.directions) {
-            System.out.println(rc.getTeamSoup());
+            System.out.println("|>>" + rc.getTeamSoup());
             if (tryRefine(dir))
-                System.out.println("::>::I refined soup! " + rc.getTeamSoup());
-            System.out.println(rc.getTeamSoup());
+                System.out.println("I refined soup! ");
+            System.out.println(">>" + rc.getTeamSoup());
         }
         for (Direction dir : Util.directions)
             if (tryMine(dir)) {
