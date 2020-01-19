@@ -10,7 +10,7 @@ public class Miner extends Unit {
 
     int numDesignSchools = 0;
     ArrayList<MapLocation> refineryLocations = new ArrayList<MapLocation>();
-    ArrayList<MapLocation> vaporatorLocations = new ArrayList<>();
+    ArrayList<MapLocation> vaporatorLocations = new ArrayList<MapLocation>();
     ArrayList<MapLocation> soupLocations = new ArrayList<MapLocation>();
 
     public Miner(RobotController r) {
@@ -19,23 +19,29 @@ public class Miner extends Unit {
 
     public void takeTurn() throws GameActionException {
         super.takeTurn();
-        soupLocations.addAll(Arrays.asList(rc.senseNearbySoup()));
+        
         numDesignSchools += comms.getNewDesignSchoolCount();
+        soupLocations.addAll(Arrays.asList(rc.senseNearbySoup()));
         comms.updateSoupLocations(soupLocations);
         comms.updateRefnyLocations(refineryLocations);
         checkSoup();
         checkRefny();
 
         //Experimenting with vaporators.... It creates one. We can turn off all the others.
-//        if(turnCount>250 && vaporatorLocations.size() == 0){
-//            System.out.println("Trying to build vaporator");
-//            if(tryBuild(RobotType.VAPORATOR, Util.randomDirection()))
-//                System.out.println("Created a Vaporator");
-//        }
-        if (turnCount>200) {
-            if (rc.getLocation().distanceSquaredTo(hqLoc)>45 && refineryLocations.size()<1)
-                    if(tryBuild(RobotType.REFINERY, Util.randomDirection()))
-                        System.out.println("created a refinery");
+        
+        if (turnCount>230) {
+            if (refineryLocations.size()<1)
+                for (Direction dir : Util.directions)
+                    if(tryBuild(RobotType.REFINERY, dir)) {
+                        MapLocation refnyLoc = rc.getLocation().add(dir);
+                        comms.broadcastRefnyLocation(refnyLoc);
+                    }
+        }
+
+        if(turnCount>250 && vaporatorLocations.size() == 0){
+            System.out.println("Trying to build vaporator");
+            if(tryBuild(RobotType.VAPORATOR, Util.randomDirection()))
+                System.out.println("Created a Vaporator");
         }
 
         for (Direction dir : Util.directions)
@@ -49,11 +55,9 @@ public class Miner extends Unit {
                 MapLocation soupLoc = rc.getLocation().add(dir);
                 if (!soupLocations.contains(soupLoc))
                     comms.broadcastSoupLocation(soupLoc);
-
-                
             }
 
-        if (turnCount>230 && numDesignSchools < 3) {
+        if (turnCount>180 && numDesignSchools < 3) {
             if(tryBuild(RobotType.DESIGN_SCHOOL, Util.randomDirection()))
                 System.out.println("created a design school");
         }

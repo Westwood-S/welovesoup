@@ -15,7 +15,7 @@ public class Shooter extends Building {
             if (robot.type == RobotType.LANDSCAPER || robot.type == RobotType.DELIVERY_DRONE || robot.type == RobotType.NET_GUN || robot.type == RobotType.MINER) {
                 if (rc.canShootUnit(robot.ID)) {
                     rc.shootUnit(robot.ID);
-                    break;
+                    rc.setIndicatorLine(rc.getLocation(), robot.location, 255, 255, 0);
                 }
             }
         }
