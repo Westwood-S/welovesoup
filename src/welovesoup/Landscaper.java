@@ -2,15 +2,17 @@ package welovesoup;
 import battlecode.common.*;
 
 public class Landscaper extends Unit {
-
+    int dirtCarrying = 0;
+    boolean nextToHQ = false;
     public Landscaper(RobotController r) {
         super(r);
     }
 
     public void takeTurn() throws GameActionException {
         super.takeTurn();
-
-        if (hqLoc != null && rc.getLocation().isAdjacentTo(hqLoc)) {
+        dirtCarrying = rc.getDirtCarrying();
+        nextToHQ = rc.getLocation().isAdjacentTo(hqLoc);
+        if (hqLoc != null && nextToHQ) {
             Direction dirtohq = rc.getLocation().directionTo(hqLoc);
             if(rc.canDigDirt(dirtohq)){
                 rc.digDirt(dirtohq);
@@ -22,14 +24,14 @@ public class Landscaper extends Unit {
             else
                 nav.goTo(hqLoc);
         }
-            
 
-        if(rc.getDirtCarrying() == 0 && rc.getLocation().isAdjacentTo(hqLoc)){
+        if(nextToHQ && dirtCarrying > 0){
+            if (rc.canDepositDirt((Direction.CENTER)))
+                rc.depositDirt(Direction.CENTER);
+        }else if (dirtCarrying == 0 && rc.getLocation().distanceSquaredTo(hqLoc)<=2){
             tryDig();
         }
-        if(rc.getDirtCarrying() > 0 && hqLoc.isAdjacentTo(rc.getLocation())){
-            rc.depositDirt(Direction.CENTER);
-        }
+
 //        MapLocation bestPlaceToBuildWall = null;
 //         //find best place to build
 //        if(hqLoc != null) {

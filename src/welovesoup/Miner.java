@@ -46,8 +46,8 @@ public class Miner extends Unit {
         if (turnCount > 75 && Soup > 150 && numDesignSchools == 0 && disToHQ>4) {
             System.out.println("Trying School"); build(RobotType.DESIGN_SCHOOL); }
 //Vaporator
-        if(turnCount> 250 && Soup > 500 && vaporatorLocations.size() == 0 && disToHQ> 4){
-            System.out.println("Trying to build vaporator"); build(RobotType.VAPORATOR); }
+//        if(turnCount> 250 && Soup > 500 && vaporatorLocations.size() == 0 && disToHQ> 4){
+//            System.out.println("Trying to build vaporator"); build(RobotType.VAPORATOR); }
 //net gun
 //        if(turnCount>150 && Soup > 250 && numNetgun == 0 && disToHQ> 4) {
 //            System.out.println("Trying gun"); build(RobotType.NET_GUN); }
@@ -172,31 +172,4 @@ public class Miner extends Unit {
         }
     }
 }
-////Refinery
-//        if (turnCount >150) {
-//            if (refineryLocations.size()<1)
-//                for (Direction dir : Util.directions)
-//                    if(tryBuild(RobotType.REFINERY, dir)) {
-//                        MapLocation refnyLoc = rc.getLocation().add(dir);
-//                        comms.broadcastRefnyLocation(refnyLoc);
-//                    }
-//        }
-////Vaporator
-////        if(turnCount>250 && vaporatorLocations.size() == 0) {
-////            System.out.println("Trying to build vaporator");
-////            if (tryBuild(RobotType.VAPORATOR, randomDir)) {
-////                System.out.println("Created a Vaporator");
-////                MapLocation VapeLoc = rc.getLocation().add(randomDir);
-////                comms.broadcastVaporatorLocation(VapeLoc);
-////            }
-////        }
-//
-////Design school
-//        if (turnCount >60 && numDesignSchools < 1 && disToHQ>8) {
-//            if (tryBuild(RobotType.DESIGN_SCHOOL, randomDir))
-//                comms.broadcastDesignSchoolCreation(new MapLocation(randomDir.dx, randomDir.dy));
-//        }
-////NetGun
-////        if (turnCount>80 && numGun<1 && disToHQ>8)
-////            if (tryBuild(RobotType.NET_GUN, randomDir))
-////                numGun++;
+
