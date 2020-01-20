@@ -9,7 +9,7 @@ public class Drone extends Unit {
     MapLocation mapp = null;
     public void takeTurn() throws GameActionException {
         super.takeTurn();
-        RobotInfo[] robotInfos = rc.senseNearbyRobots();
+        RobotInfo[] robotInfos = rc.senseNearbyRobots(GameConstants.DELIVERY_DRONE_PICKUP_RADIUS_SQUARED,rc.getTeam().opponent());
         if(rc.isCurrentlyHoldingUnit()) {
             nav.goTo(Direction.WEST);
             while(!rc.canDropUnit(Direction.WEST))

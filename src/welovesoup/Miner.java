@@ -10,6 +10,7 @@ public class Miner extends Unit {
 
     int numDesignSchools = 0;
     int numFulfillmentCenters = 0;
+    int numGun=0;  
     ArrayList<MapLocation> refineryLocations = new ArrayList<MapLocation>();
     ArrayList<MapLocation> vaporatorLocations = new ArrayList<MapLocation>();
     ArrayList<MapLocation> soupLocations = new ArrayList<MapLocation>();
@@ -35,8 +36,8 @@ public class Miner extends Unit {
         Direction randomDir = Util.randomDirection();
 //---------------------------------------Trying to build------------------------------------
 //Refinery
-        if (turnCount >180) {
-            if (refineryLocations.size()<1 && rc.getLocation().distanceSquaredTo(hqLoc)>100)
+        if (turnCount >150) {
+            if (refineryLocations.size()<1)
                 for (Direction dir : Util.directions)
                     if(tryBuild(RobotType.REFINERY, dir)) {
                         MapLocation refnyLoc = rc.getLocation().add(dir);
@@ -44,23 +45,27 @@ public class Miner extends Unit {
                     }
         }
 //Vaporator
-        if(turnCount>250 && vaporatorLocations.size() == 0) {
-            System.out.println("Trying to build vaporator");
-            if (tryBuild(RobotType.VAPORATOR, randomDir)) {
-                System.out.println("Created a Vaporator");
-                MapLocation VapeLoc = rc.getLocation().add(randomDir);
-                comms.broadcastVaporatorLocation(VapeLoc);
-            }
-        }
+//        if(turnCount>250 && vaporatorLocations.size() == 0) {
+//            System.out.println("Trying to build vaporator");
+//            if (tryBuild(RobotType.VAPORATOR, randomDir)) {
+//                System.out.println("Created a Vaporator");
+//                MapLocation VapeLoc = rc.getLocation().add(randomDir);
+//                comms.broadcastVaporatorLocation(VapeLoc);
+//            }
+//        }
 
 //Design school
-        if (turnCount >180 && numDesignSchools < 2 && rc.getLocation().distanceSquaredTo(hqLoc)>8) { 
+        if (turnCount >60 && numDesignSchools < 1 && rc.getLocation().distanceSquaredTo(hqLoc)>8) { 
             if (tryBuild(RobotType.DESIGN_SCHOOL, randomDir)) 
                 comms.broadcastDesignSchoolCreation(new MapLocation(randomDir.dx, randomDir.dy));
         }
+//NetGun
+//        if (turnCount>80 && numGun<1 && rc.getLocation().distanceSquaredTo(hqLoc)>8)
+//            if (tryBuild(RobotType.NET_GUN, randomDir)) 
+//                numGun++;
 
 // Fulfillment Center
-        if (turnCount >250 && numFulfillmentCenters < 1) { // && rc.getLocation().distanceSquaredTo(hqLoc)>1) {
+        if (turnCount >300 && numFulfillmentCenters < 1) { // && rc.getLocation().distanceSquaredTo(hqLoc)>1) {
             randomDir = Util.randomDirection();
             while(!tryBuild(RobotType.FULFILLMENT_CENTER, randomDir)) {
                 randomDir = Util.randomDirection();
@@ -85,13 +90,18 @@ public class Miner extends Unit {
                 MapLocation soupLoc = rc.getLocation().add(dir);
                 if (!soupLocations.contains(soupLoc))
                     comms.broadcastSoupLocation(soupLoc);
+                if (turnCount>150)
+                     if(tryBuild(RobotType.REFINERY, randomDir)) {
+                        MapLocation refnyLoc = rc.getLocation().add(randomDir);
+                        comms.broadcastRefnyLocation(refnyLoc);
+                    }
             }
 
 //------------------------------Nav-----------------------------------
-        if (turnCount>180) {
+        if (turnCount>200) {
             if (soupLocations.size() > 0) 
                 nav.goTo(soupLocations.get(0));
-            else if (refineryLocations.size() > 0)
+            else if (rc.getSoupCarrying() == RobotType.MINER.soupLimit && refineryLocations.size() > 0)
                 nav.goTo(refineryLocations.get(0));
             else 
                 if (nav.goTo(randomDir))
@@ -99,9 +109,8 @@ public class Miner extends Unit {
         }
         else if (rc.getSoupCarrying() == RobotType.MINER.soupLimit) {
             // time to go back to the HQ
-            if (numDesignSchools==0)
-                if(nav.goTo(hqLoc))
-                    System.out.println("moved towards HQ");
+            if (nav.goTo(hqLoc))
+                System.out.println("moved towards HQ");
             else if (refineryLocations.size() > 0)
                 nav.goTo(refineryLocations.get(0));
             else 
@@ -154,7 +163,7 @@ public class Miner extends Unit {
         }
     }
     void checkRefny() throws GameActionException {
-        if (refineryLocations.size()!=0 && rc.getLocation().distanceSquaredTo(refineryLocations.get(0))>100) {
+        if (refineryLocations.size()>1 && rc.getLocation().distanceSquaredTo(refineryLocations.get(0))>100) {
             refineryLocations.remove(0);
         }
     }

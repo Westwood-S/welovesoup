@@ -76,18 +76,7 @@ public class Communications {
         return count;
     }
 
-    public int getNewFulfillmentCenterCount() throws GameActionException {
-        int count = 0;
-        for(Transaction tx : rc.getBlock(rc.getRoundNum() - 1)) {
-            int[] mess = tx.getMessage();
-            if(mess[0] == teamSecret && mess[1] == 4) {
-                System.out.println("heard about a cool new fulfillment center");
-                count += 1;
-            }
-        }
-        return count;
-    }
-
+    
     public void broadcastSoupLocation(MapLocation loc ) throws GameActionException {
         int[] message = new int[7];
         message[0] = teamSecret;
@@ -144,6 +133,19 @@ public class Communications {
             System.out.println("new fulfillment center!" + loc);
         }
     }
+
+    public int getNewFulfillmentCenterCount() throws GameActionException {
+        int count = 0;
+        for(Transaction tx : rc.getBlock(rc.getRoundNum() - 1)) {
+            int[] mess = tx.getMessage();
+            if(mess[0] == teamSecret && mess[1] == 4) {
+                System.out.println("heard about a cool new fulfillment center");
+                count += 1;
+            }
+        }
+        return count;
+    }
+
 
     public void broadcastVaporatorLocation(MapLocation loc) throws GameActionException {
         int[] message = new int[7];
