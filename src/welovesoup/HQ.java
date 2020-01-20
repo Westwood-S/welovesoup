@@ -12,12 +12,15 @@ public class HQ extends Shooter {
     public void takeTurn() throws GameActionException {
         super.takeTurn();
         boolean isBuilt = false;
-        if(numMiners < 150)
-            //for (Direction dir : Util.directions)
-            isBuilt = tryBuild(RobotType.MINER, Util.randomDirection());
-        numMiners++;
-        while(isBuilt != true)
-            isBuilt = tryBuild(RobotType.MINER, Util.randomDirection());
-            numMiners++;
+
+        if(numMiners < 5)
+            for (Direction dir : Util.directions) {
+                //isBuilt = tryBuild(RobotType.MINER, Util.randomDirection());
+                //numMiners++;
+                if (numMiners >= 5)
+                    break;
+                if (tryBuild(RobotType.MINER, dir))
+                    numMiners++;
+            }
     }
 }
