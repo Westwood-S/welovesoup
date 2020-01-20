@@ -172,31 +172,4 @@ public class Miner extends Unit {
         }
     }
 }
-////Refinery
-//        if (turnCount >150) {
-//            if (refineryLocations.size()<1)
-//                for (Direction dir : Util.directions)
-//                    if(tryBuild(RobotType.REFINERY, dir)) {
-//                        MapLocation refnyLoc = rc.getLocation().add(dir);
-//                        comms.broadcastRefnyLocation(refnyLoc);
-//                    }
-//        }
-////Vaporator
-////        if(turnCount>250 && vaporatorLocations.size() == 0) {
-////            System.out.println("Trying to build vaporator");
-////            if (tryBuild(RobotType.VAPORATOR, randomDir)) {
-////                System.out.println("Created a Vaporator");
-////                MapLocation VapeLoc = rc.getLocation().add(randomDir);
-////                comms.broadcastVaporatorLocation(VapeLoc);
-////            }
-////        }
-//
-////Design school
-//        if (turnCount >60 && numDesignSchools < 1 && disToHQ>8) {
-//            if (tryBuild(RobotType.DESIGN_SCHOOL, randomDir))
-//                comms.broadcastDesignSchoolCreation(new MapLocation(randomDir.dx, randomDir.dy));
-//        }
-////NetGun
-////        if (turnCount>80 && numGun<1 && disToHQ>8)
-////            if (tryBuild(RobotType.NET_GUN, randomDir))
-////                numGun++;
+
