@@ -16,8 +16,13 @@ public class Landscaper extends Unit {
                 rc.digDirt(dirtohq);
             }
         }
-        else 
-            nav.goTo(Util.randomDirection());
+        else {
+            if (Math.random() < 0.5)
+                nav.goTo(Util.randomDirection());
+            else
+                nav.goTo(hqLoc);
+        }
+            
 
         if(rc.getDirtCarrying() == 0 && rc.getLocation().distanceSquaredTo(hqLoc)<=2){
             tryDig();
@@ -39,7 +44,7 @@ public class Landscaper extends Unit {
             }
         }
 
-        if (Math.random() < 0.5 && turnCount>280){
+        if (turnCount>220){
             // build the wall
             if (bestPlaceToBuildWall != null) {
                 rc.depositDirt(rc.getLocation().directionTo(bestPlaceToBuildWall));
