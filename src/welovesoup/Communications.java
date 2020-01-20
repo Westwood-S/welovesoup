@@ -62,6 +62,7 @@ public class Communications {
         }
     }
 
+
     // check the latest block for unit creation messages
     public int getNewDesignSchoolCount() throws GameActionException {
         int count = 0;
@@ -118,6 +119,30 @@ public class Communications {
                 refnyLocations.add(new MapLocation(mess[2], mess[3]));
             }
         }
+    }
+
+    public void broadcastFulfillmentCenterCreation(MapLocation loc) throws GameActionException {
+        int[] message = new int[7];
+        message[0] = teamSecret;
+        message[1] = 4;
+        message[2] = loc.x; // x coord of HQ
+        message[3] = loc.y; // y coord of HQ
+        if (rc.canSubmitTransaction(message, 3)) {
+            rc.submitTransaction(message, 3);
+            broadcastedCreationFulfillmentCenter = true;
+        }
+    }
+
+    public int getNewFulfillmentCenterCount() throws GameActionException {
+        int count = 0;
+        for(Transaction tx : rc.getBlock(rc.getRoundNum() - 1)) {
+            int[] mess = tx.getMessage();
+            if(mess[0] == teamSecret && mess[1] == 4) {
+                System.out.println("heard about a cool new fulfillment center");
+                count += 1;
+            }
+        }
+        return count;
     }
 
     public void broadcastVaporatorLocation(MapLocation loc) throws GameActionException {
