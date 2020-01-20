@@ -28,7 +28,7 @@ public class Miner extends Unit {
         comms.updateSoupLocations(soupLocations);
         comms.updateRefnyLocations(refineryLocations);
         comms.updateVaporatorLocations(vaporatorLocations);
-        System.out.println("Vaporator Locations:" + vaporatorLocations);
+        //System.out.println("Vaporator Locations:" + vaporatorLocations);
         
         checkSoup();
         checkRefny();
