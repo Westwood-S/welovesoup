@@ -4,6 +4,7 @@ import battlecode.common.*;
 public class Landscaper extends Unit {
     int dirtCarrying = 0;
     boolean nextToHQ = false;
+    boolean takenTurn = false;
     public Landscaper(RobotController r) {
         super(r);
     }
@@ -16,18 +17,19 @@ public class Landscaper extends Unit {
             Direction dirtohq = rc.getLocation().directionTo(hqLoc);
             if(rc.canDigDirt(dirtohq)){
                 rc.digDirt(dirtohq);
+                takenTurn = true;
+            }
+        } else {
+            if (Math.random() < 0.7 && !takenTurn) {
+                nav.goTo(Util.randomDirection());
+            } else {
+                nav.goTo(hqLoc);
             }
         }
-        else {
-            if (Math.random() < 0.7)
-                nav.goTo(Util.randomDirection());
-            else
-                nav.goTo(hqLoc);
-        }
 
-        if(nextToHQ && dirtCarrying > 0){
-            //if(rc.)
-            rc.depositDirt(Direction.CENTER);
+        if(nextToHQ && dirtCarrying > 0 ){
+            if(rc.canDepositDirt(Direction.CENTER))
+                rc.depositDirt(Direction.CENTER);
         }else if (dirtCarrying == 0 && rc.getLocation().distanceSquaredTo(hqLoc)<=2){
             tryDig();
         }
