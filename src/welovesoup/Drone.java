@@ -6,26 +6,42 @@ public class Drone extends Unit {
     public Drone(RobotController r) {
         super(r);
     }
-
+    MapLocation mapp = null;
     public void takeTurn() throws GameActionException {
         super.takeTurn();
+        RobotInfo[] robotInfos = rc.senseNearbyRobots();
+        if(rc.isCurrentlyHoldingUnit()) {
+            nav.goTo(Direction.WEST);
+            while(!rc.canDropUnit(Direction.WEST))
+                nav.goTo(Direction.WEST);
+            rc.dropUnit(Direction.WEST);
+        }
+        for(RobotInfo r: robotInfos) {
+            if(r.type == RobotType.LANDSCAPER) {
+                mapp = r.location;
+                System.out.println(nav.goTo(r.location));
+                if (rc.canPickUpUnit(r.getID()))
+                    rc.pickUpUnit(r.getID());
+                while(!rc.isCurrentlyHoldingUnit()) {
+                    nav.goTo(r.location);
+                        if (rc.canPickUpUnit(r.getID()))
+                            rc.pickUpUnit(r.getID());
+                }
+                System.out.println(r.getID());
+            }
+        }
         Direction direction = Util.randomDirection();
-        while(!nav.goTo(direction))
+        boolean bb = false;
+        if (mapp != null)
+            bb = nav.goTo(mapp);
+        else
+            nav.goTo(direction);
+        while(!bb) {
             direction = Util.randomDirection();
-        System.out.println("Moving drone");
-//        RobotInfo[] robotInfos = rc.senseNearbyRobots();
-//        for(RobotInfo r: robotInfos) {
-//            if(r.type == RobotType.COW) {
-//                while(!nav.goTo(Util.randomDirection())) ;
-//                System.out.println("Moving a COOWW");
-////                if(rc.canPickUpUnit(r.getID())) {
-////                    System.out.println("^^^^^^^^^^^^^^^^^^^^^^^");
-////                    rc.pickUpUnit(r.getID());
-////                    nav.goTo(new MapLocation(5,5));
-////                    rc.dropUnit(Direction.SOUTH);
-////                }
-//                System.out.println("drone delivered a cow to enemy");
-//            }
-//        }
+            if (mapp != null)
+                bb = nav.goTo(mapp);
+            else
+                nav.goTo(direction);
+        }
     }
 }
