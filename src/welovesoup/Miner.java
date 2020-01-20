@@ -32,13 +32,13 @@ public class Miner extends Unit {
         Direction randomDir = Util.randomDirection();
 //---------------------------------------Trying to build------------------------------------
 //Refinery
-        if (turnCount>50 && refineryLocations.size()<1) {
+        if (turnCount>150 && refineryLocations.size()<1) {
             while(rc.getLocation().distanceSquaredTo(hqLoc)<45) {
                 rc.move(randomDir);
             }
-                for (Direction dir : Util.directions)
-                    if (tryBuild(RobotType.REFINERY, dir)) {
-                        MapLocation refnyLoc = rc.getLocation().add(dir);
+               // for (Direction dir : Util.directions)
+                    if (tryBuild(RobotType.REFINERY, randomDir)) {
+                        MapLocation refnyLoc = rc.getLocation().add(randomDir);
                         comms.broadcastRefnyLocation(refnyLoc);
                     }
         }
@@ -52,11 +52,11 @@ public class Miner extends Unit {
 //                comms.broadcastVaporatorLocation(VapeLoc);
 //            }
 //        }
-//Design school
-        if (turnCount>75 && numDesignSchools == 0 && rc.getLocation().distanceSquaredTo(hqLoc)>4) {
-            if(tryBuild(RobotType.DESIGN_SCHOOL, randomDir))
-                System.out.println("created a design school");
-        }
+////Design school
+//        if (turnCount>50 && numDesignSchools == 0 && rc.getLocation().distanceSquaredTo(hqLoc)>4) {
+//            if(tryBuild(RobotType.DESIGN_SCHOOL, randomDir))
+//                System.out.println("created a design school");
+//        }
 //net gun
 //        if(turnCount>75 && numNetgun == 0 && rc.getLocation().distanceSquaredTo(hqLoc)> 4)
 //            if(tryBuild(RobotType.NET_GUN, randomDir)) {
@@ -68,7 +68,7 @@ public class Miner extends Unit {
         for (Direction dir : Util.directions)
             if (tryRefine(dir)){
                 MapLocation refnyLoc = rc.getLocation().add(dir);
-                if (!refineryLocations.contains(refnyLoc) && refnyLoc != hqLoc)
+                if (refineryLocations.contains(refnyLoc) && refnyLoc != hqLoc) //this was !refinery
                     comms.broadcastRefnyLocation(refnyLoc);
             }
 //Soup
@@ -93,6 +93,7 @@ public class Miner extends Unit {
 
         } else if (soupLocations.size() > 0) {
             nav.goTo(soupLocations.get(0));
+            //Here is where algorithm will go.
         } else if (nav.goTo(randomDir)) {
             // otherwise, move randomly as usual
             System.out.println("I moved randomly!");
