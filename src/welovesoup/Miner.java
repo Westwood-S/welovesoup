@@ -23,18 +23,19 @@ public class Miner extends Unit {
         
         numDesignSchools += comms.getNewDesignSchoolCount();
         numFulfillmentCenters += comms.getNewFulfillmentCenterCount();
-        soupLocations.addAll(Arrays.asList(rc.senseNearbySoup()));
+        //soupLocations.addAll(Arrays.asList(rc.senseNearbySoup()));
         comms.updateSoupLocations(soupLocations);
         comms.updateRefnyLocations(refineryLocations);
         comms.updateVaporatorLocations(vaporatorLocations);
         System.out.println("Vaporator Locations:" + vaporatorLocations);
+        
         checkSoup();
         checkRefny();
 
         Direction randomDir = Util.randomDirection();
 //---------------------------------------Trying to build------------------------------------
 //Refinery
-        if (turnCount>230) {
+        if (numDesignSchools>=2) {
             if (refineryLocations.size()<1)
                 for (Direction dir : Util.directions)
                     if(tryBuild(RobotType.REFINERY, dir)) {
@@ -53,10 +54,7 @@ public class Miner extends Unit {
         }
 
 //Design school
-        System.out.println("design school");
-        System.out.println(numDesignSchools);
-        if (turnCount >20 && numDesignSchools < 2) { // && rc.getLocation().distanceSquaredTo(hqLoc)>1) {
-            randomDir = Util.randomDirection();
+        if (turnCount >180 && numDesignSchools <= 2 && rc.getLocation().distanceSquaredTo(hqLoc)>8) { 
             if (!tryBuild(RobotType.DESIGN_SCHOOL, randomDir)) {
                 randomDir = Util.randomDirection();
             }
@@ -65,13 +63,14 @@ public class Miner extends Unit {
         }
 
 // Fulfillment Center
-        if (turnCount >150 && numFulfillmentCenters < 1) { // && rc.getLocation().distanceSquaredTo(hqLoc)>1) {
+        if (turnCount >250 && numFulfillmentCenters < 1) { // && rc.getLocation().distanceSquaredTo(hqLoc)>1) {
             randomDir = Util.randomDirection();
             while(!tryBuild(RobotType.FULFILLMENT_CENTER, randomDir)) {
                 randomDir = Util.randomDirection();
             }
             System.out.println("created a fulfilment center");
             comms.broadcastFulfillmentCenterCreation(new MapLocation(randomDir.dx, randomDir.dy));
+            
         }
 
 
