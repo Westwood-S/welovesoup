@@ -24,44 +24,23 @@ public class Miner extends Unit {
         numDesignSchools += comms.getNewDesignSchoolCount();
         soupLocations.addAll(Arrays.asList(rc.senseNearbySoup()));
         comms.updateSoupLocations(soupLocations); //System.out.println("Soup locations: " + soupLocations.size()); //Debugging purpose
-        comms.updateRefnyLocations(refineryLocations);  System.out.println("Refinery locations: " + refineryLocations.size());
+        comms.updateRefnyLocations(refineryLocations);  //System.out.println("Refinery locations: " + refineryLocations.size());
         comms.updateVaporatorLocations(vaporatorLocations);
         checkSoup();
         checkRefny();
+        int Soup = rc.getTeamSoup();
 
         Direction randomDir = Util.randomDirection();
 //---------------------------------------Trying to build------------------------------------
 //Refinery
-        if (turnCount>150 && refineryLocations.size()<1) {
-            while(rc.getLocation().distanceSquaredTo(hqLoc)<45) {
-                rc.move(randomDir);
-            }
-               // for (Direction dir : Util.directions)
-                    if (tryBuild(RobotType.REFINERY, randomDir)) {
-                        MapLocation refnyLoc = rc.getLocation().add(randomDir);
-                        comms.broadcastRefnyLocation(refnyLoc);
-                    }
-        }
-        //if (turnCount > 50 &&
-////Vaporator
-//        if(turnCount>250 && vaporatorLocations.size() == 0) {
-//            System.out.println("Trying to build vaporator");
-//            if (tryBuild(RobotType.VAPORATOR, randomDir)) {
-//                System.out.println("Created a Vaporator");
-//                MapLocation VapeLoc = rc.getLocation().add(randomDir);
-//                comms.broadcastVaporatorLocation(VapeLoc);
-//            }
-//        }
-////Design school
-//        if (turnCount>50 && numDesignSchools == 0 && rc.getLocation().distanceSquaredTo(hqLoc)>4) {
-//            if(tryBuild(RobotType.DESIGN_SCHOOL, randomDir))
-//                System.out.println("created a design school");
-//        }
+        if (turnCount> 50 && Soup > 200 &&rc.getLocation().distanceSquaredTo(hqLoc) > 35 &&  refineryLocations.size()<1) {   System.out.println("Trying Refin"); build(RobotType.REFINERY);}
+//Design school
+        if (turnCount > 75 && numDesignSchools == 0 && rc.getLocation().distanceSquaredTo(hqLoc)>4) {  System.out.println("Trying School"); build(RobotType.DESIGN_SCHOOL); }
+//Vaporator
+        if(turnCount>250 && Soup > 500 && vaporatorLocations.size() == 0) { System.out.println("Trying to build vaporator"); build(RobotType.VAPORATOR); }
 //net gun
-//        if(turnCount>75 && numNetgun == 0 && rc.getLocation().distanceSquaredTo(hqLoc)> 4)
-//            if(tryBuild(RobotType.NET_GUN, randomDir)) {
-//                System.out.println("Created a net gun somewhere random");
-//            }
+        if(turnCount>125 && Soup > 250 && numNetgun == 0 && rc.getLocation().distanceSquaredTo(hqLoc)> 4) { System.out.println("Trying gun"); build(RobotType.NET_GUN); }
+
 
 //----------------------------------Searching for --------------------------------
  //Refinery
@@ -136,6 +115,7 @@ public class Miner extends Unit {
             }
         }
         if(soupLocations.contains(rc.getLocation()) && rc.senseSoup(rc.getLocation()) == 0){
+            System.out.println("SoupLocations cleared");
             soupLocations.clear();
         }
     }
@@ -144,4 +124,21 @@ public class Miner extends Unit {
             refineryLocations.remove(0);
         }
     }
+
+    public void build(RobotType building) throws GameActionException {
+        for(Direction dir : Util.directions){
+            if (tryBuild(building, dir)) {
+                MapLocation Location = rc.getLocation().add(dir);
+                switch(building){
+                    case REFINERY:              comms.broadcastRefnyLocation(Location); break;
+                    case FULFILLMENT_CENTER:    System.out.println("Drones ready to be built"); break;
+                    case DESIGN_SCHOOL:         comms.broadcastDesignSchoolCreation(Location); break;
+                    case VAPORATOR:             comms.broadcastVaporatorLocation(Location); break;
+                    case NET_GUN:               System.out.println("Netgun created"); break;
+                }
+            }
+        }
+    }
+
+
 }
