@@ -9,6 +9,7 @@ import java.util.Map;
 public class Miner extends Unit {
 
     int numDesignSchools = 0;
+    int numNetgun = 0;
     ArrayList<MapLocation> refineryLocations = new ArrayList<MapLocation>();
     ArrayList<MapLocation> vaporatorLocations = new ArrayList<MapLocation>();
     ArrayList<MapLocation> soupLocations = new ArrayList<MapLocation>();
@@ -23,7 +24,7 @@ public class Miner extends Unit {
         numDesignSchools += comms.getNewDesignSchoolCount();
         soupLocations.addAll(Arrays.asList(rc.senseNearbySoup()));
         comms.updateSoupLocations(soupLocations); //System.out.println("Soup locations: " + soupLocations.size()); //Debugging purpose
-        comms.updateRefnyLocations(refineryLocations);
+        comms.updateRefnyLocations(refineryLocations);  System.out.println("Refinery locations: " + refineryLocations.size());
         comms.updateVaporatorLocations(vaporatorLocations);
         checkSoup();
         checkRefny();
@@ -31,7 +32,7 @@ public class Miner extends Unit {
         Direction randomDir = Util.randomDirection();
 //---------------------------------------Trying to build------------------------------------
 //Refinery
-        if (turnCount>150 && refineryLocations.size()<1) {
+        if (turnCount>50 && refineryLocations.size()<1) {
             while(rc.getLocation().distanceSquaredTo(hqLoc)<45) {
                 rc.move(randomDir);
             }
@@ -52,11 +53,15 @@ public class Miner extends Unit {
 //            }
 //        }
 //Design school
-
-        if (turnCount>180 && numDesignSchools == 0 && rc.getLocation().distanceSquaredTo(hqLoc)>4) {
+        if (turnCount>75 && numDesignSchools == 0 && rc.getLocation().distanceSquaredTo(hqLoc)>4) {
             if(tryBuild(RobotType.DESIGN_SCHOOL, randomDir))
                 System.out.println("created a design school");
         }
+//net gun
+//        if(turnCount>75 && numNetgun == 0 && rc.getLocation().distanceSquaredTo(hqLoc)> 4)
+//            if(tryBuild(RobotType.NET_GUN, randomDir)) {
+//                System.out.println("Created a net gun somewhere random");
+//            }
 
 //----------------------------------Searching for --------------------------------
  //Refinery
