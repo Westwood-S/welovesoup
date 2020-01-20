@@ -16,7 +16,7 @@ public class Drone extends Unit {
         RobotInfo[] robotInfos = rc.senseNearbyRobots();
         if(rc.isCurrentlyHoldingUnit()) {
             nav.goTo(randomDir);
-            if (rc.senseFlooding(rc.getLocation().add(randomDir)) && rc.canDropUnit(randomDir))
+            if (rc.senseFlooding(rc.getLocation()) && rc.canDropUnit(randomDir))
                 rc.dropUnit(randomDir);
             nav.goTo(hqLoc);
         }

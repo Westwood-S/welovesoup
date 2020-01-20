@@ -40,10 +40,10 @@ public class Miner extends Unit {
 
 
 //Refinery
-        if (turnCount> 100 && Soup > 200 && disToHQ>35 &&  refineryLocations.size()<1) {
+        if (turnCount> 150 && disToHQ>35 && refineryLocations.size()<1) {
             System.out.println("Trying Refin"); build(RobotType.REFINERY);   }
 //Design school
-        if (turnCount > 75 && Soup > 150 && numDesignSchools == 0 && disToHQ>4) {
+        if (turnCount > 60 && numDesignSchools == 0 && disToHQ>4) {
             System.out.println("Trying School"); build(RobotType.DESIGN_SCHOOL); }
 //Vaporator
 //        if(turnCount> 250 && Soup > 500 && vaporatorLocations.size() == 0 && disToHQ> 4){
