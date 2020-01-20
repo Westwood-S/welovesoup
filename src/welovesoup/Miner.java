@@ -10,10 +10,11 @@ public class Miner extends Unit {
 
     int numDesignSchools = 0;
     int numNetgun = 0;
+    //struct locatio
     ArrayList<MapLocation> refineryLocations = new ArrayList<MapLocation>();
     ArrayList<MapLocation> vaporatorLocations = new ArrayList<MapLocation>();
     ArrayList<MapLocation> soupLocations = new ArrayList<MapLocation>();
-
+    int[][] map = new MapLocation;
     public Miner(RobotController r) {
         super(r);
     }
@@ -28,18 +29,24 @@ public class Miner extends Unit {
         comms.updateVaporatorLocations(vaporatorLocations);
         checkSoup();
         checkRefny();
+
+        int disToHQ = rc.getLocation().distanceSquaredTo(hqLoc);
         int Soup = rc.getTeamSoup();
 
         Direction randomDir = Util.randomDirection();
 //---------------------------------------Trying to build------------------------------------
 //Refinery
-        if (turnCount> 50 && Soup > 200 &&rc.getLocation().distanceSquaredTo(hqLoc) > 35 &&  refineryLocations.size()<1) {   System.out.println("Trying Refin"); build(RobotType.REFINERY);}
+        if (turnCount> 50 && Soup > 200 &&rc.getLocation().distanceSquaredTo(hqLoc) > 35 &&  refineryLocations.size()<1) {
+            System.out.println("Trying Refin"); build(RobotType.REFINERY);   }
 //Design school
-        if (turnCount > 75 && numDesignSchools == 0 && rc.getLocation().distanceSquaredTo(hqLoc)>4) {  System.out.println("Trying School"); build(RobotType.DESIGN_SCHOOL); }
+        if (turnCount > 125 && numDesignSchools == 0 && rc.getLocation().distanceSquaredTo(hqLoc)>4) {
+            System.out.println("Trying School"); build(RobotType.DESIGN_SCHOOL); }
 //Vaporator
-        if(turnCount>250 && Soup > 500 && vaporatorLocations.size() == 0) { System.out.println("Trying to build vaporator"); build(RobotType.VAPORATOR); }
+        if(turnCount> 100 && Soup > 500 && vaporatorLocations.size() == 0 && rc.getLocation().distanceSquaredTo(hqLoc)> 4){
+            System.out.println("Trying to build vaporator"); build(RobotType.VAPORATOR); }
 //net gun
-        if(turnCount>125 && Soup > 250 && numNetgun == 0 && rc.getLocation().distanceSquaredTo(hqLoc)> 4) { System.out.println("Trying gun"); build(RobotType.NET_GUN); }
+        if(turnCount>150 && Soup > 250 && numNetgun == 0 && rc.getLocation().distanceSquaredTo(hqLoc)> 4) {
+            System.out.println("Trying gun"); build(RobotType.NET_GUN); }
 
 
 //----------------------------------Searching for --------------------------------
@@ -74,6 +81,7 @@ public class Miner extends Unit {
             nav.goTo(soupLocations.get(0));
             //Here is where algorithm will go.
         } else if (nav.goTo(randomDir)) {
+            //EXplore
             // otherwise, move randomly as usual
             System.out.println("I moved randomly!");
         }
