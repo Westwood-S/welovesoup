@@ -35,8 +35,8 @@ public class Miner extends Unit {
         Direction randomDir = Util.randomDirection();
 //---------------------------------------Trying to build------------------------------------
 //Refinery
-        if (numDesignSchools>=2) {
-            if (refineryLocations.size()<1)
+        if (turnCount >180) {
+            if (refineryLocations.size()<1 && rc.getLocation().distanceSquaredTo(hqLoc)>100)
                 for (Direction dir : Util.directions)
                     if(tryBuild(RobotType.REFINERY, dir)) {
                         MapLocation refnyLoc = rc.getLocation().add(dir);
@@ -54,12 +54,9 @@ public class Miner extends Unit {
         }
 
 //Design school
-        if (turnCount >180 && numDesignSchools <= 2 && rc.getLocation().distanceSquaredTo(hqLoc)>8) { 
-            if (!tryBuild(RobotType.DESIGN_SCHOOL, randomDir)) {
-                randomDir = Util.randomDirection();
-            }
-            System.out.println("created a design school");
-            comms.broadcastDesignSchoolCreation(new MapLocation(randomDir.dx, randomDir.dy));
+        if (turnCount >180 && numDesignSchools < 2 && rc.getLocation().distanceSquaredTo(hqLoc)>8) { 
+            if (tryBuild(RobotType.DESIGN_SCHOOL, randomDir)) 
+                comms.broadcastDesignSchoolCreation(new MapLocation(randomDir.dx, randomDir.dy));
         }
 
 // Fulfillment Center
@@ -79,8 +76,8 @@ public class Miner extends Unit {
         for (Direction dir : Util.directions)
             if (tryRefine(dir)){
                 MapLocation refnyLoc = rc.getLocation().add(dir);
-                if (!refineryLocations.contains(refnyLoc) && refnyLoc != hqLoc)
-                    comms.broadcastRefnyLocation(refnyLoc);
+                //if (refnyLoc != hqLoc && !refineryLocations.contains(refnyLoc))
+                //    comms.broadcastRefnyLocation(refnyLoc);
             }
 //Soup
         for (Direction dir : Util.directions)
@@ -91,7 +88,7 @@ public class Miner extends Unit {
             }
 
 //------------------------------Nav-----------------------------------
-        if (numDesignSchools >= 3) {
+        if (turnCount>180) {
             if (soupLocations.size() > 0) 
                 nav.goTo(soupLocations.get(0));
             else if (refineryLocations.size() > 0)
@@ -102,7 +99,7 @@ public class Miner extends Unit {
         }
         else if (rc.getSoupCarrying() == RobotType.MINER.soupLimit) {
             // time to go back to the HQ
-            if (numDesignSchools==0 || refineryLocations.size()==0)
+            if (numDesignSchools==0)
                 if(nav.goTo(hqLoc))
                     System.out.println("moved towards HQ");
             else if (refineryLocations.size() > 0)
