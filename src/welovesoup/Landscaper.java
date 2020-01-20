@@ -24,10 +24,10 @@ public class Landscaper extends Unit {
         }
             
 
-        if(rc.getDirtCarrying() == 0 && rc.getLocation().distanceSquaredTo(hqLoc)<=2){
+        if(rc.getDirtCarrying() == 0 && rc.getLocation().isAdjacentTo(hqLoc)){
             tryDig();
         }
-        if(hqLoc.isAdjacentTo(rc.getLocation())){
+        if(rc.getDirtCarrying() > 0 && hqLoc.isAdjacentTo(rc.getLocation())){
             rc.depositDirt(Direction.CENTER);
         }
 //        MapLocation bestPlaceToBuildWall = null;
