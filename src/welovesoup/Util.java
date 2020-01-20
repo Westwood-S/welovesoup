@@ -13,7 +13,8 @@ public class Util {
         Direction.SOUTH,
         Direction.SOUTHWEST,
         Direction.WEST,
-        Direction.NORTHWEST
+        Direction.NORTHWEST,
+        Direction.CENTER,
     };
 
     /**

@@ -34,38 +34,26 @@ public class Miner extends Unit {
         checkRefny();
 
         Direction randomDir = Util.randomDirection();
-//---------------------------------------Trying to build------------------------------------
-//Refinery
-        if (turnCount >150) {
-            if (refineryLocations.size()<1)
-                for (Direction dir : Util.directions)
-                    if(tryBuild(RobotType.REFINERY, dir)) {
-                        MapLocation refnyLoc = rc.getLocation().add(dir);
-                        comms.broadcastRefnyLocation(refnyLoc);
-                    }
-        }
-//Vaporator
-//        if(turnCount>250 && vaporatorLocations.size() == 0) {
-//            System.out.println("Trying to build vaporator");
-//            if (tryBuild(RobotType.VAPORATOR, randomDir)) {
-//                System.out.println("Created a Vaporator");
-//                MapLocation VapeLoc = rc.getLocation().add(randomDir);
-//                comms.broadcastVaporatorLocation(VapeLoc);
-//            }
-//        }
+        int disToHQ = rc.getLocation().distanceSquaredTo(hqLoc);
+        int Soup = rc.getTeamSoup();
+////---------------------------------------Trying to build------------------------------------
 
+
+//Refinery
+        if (turnCount> 100 && Soup > 200 && disToHQ>35 &&  refineryLocations.size()<1) {
+            System.out.println("Trying Refin"); build(RobotType.REFINERY);   }
 //Design school
-        if (turnCount >60 && numDesignSchools < 1 && rc.getLocation().distanceSquaredTo(hqLoc)>8) { 
-            if (tryBuild(RobotType.DESIGN_SCHOOL, randomDir)) 
-                comms.broadcastDesignSchoolCreation(new MapLocation(randomDir.dx, randomDir.dy));
-        }
-//NetGun
-//        if (turnCount>80 && numGun<1 && rc.getLocation().distanceSquaredTo(hqLoc)>8)
-//            if (tryBuild(RobotType.NET_GUN, randomDir)) 
-//                numGun++;
+        if (turnCount > 75 && Soup > 150 && numDesignSchools == 0 && disToHQ>4) {
+            System.out.println("Trying School"); build(RobotType.DESIGN_SCHOOL); }
+//Vaporator
+        if(turnCount> 250 && Soup > 500 && vaporatorLocations.size() == 0 && disToHQ> 4){
+            System.out.println("Trying to build vaporator"); build(RobotType.VAPORATOR); }
+//net gun
+//        if(turnCount>150 && Soup > 250 && numNetgun == 0 && disToHQ> 4) {
+//            System.out.println("Trying gun"); build(RobotType.NET_GUN); }
 
 // Fulfillment Center
-        if (turnCount >300 && numFulfillmentCenters < 1) { // && rc.getLocation().distanceSquaredTo(hqLoc)>1) {
+        if (turnCount >300 && numFulfillmentCenters < 1) { // && disToHQ>1) {
             randomDir = Util.randomDirection();
             while(!tryBuild(RobotType.FULFILLMENT_CENTER, randomDir)) {
                 randomDir = Util.randomDirection();
@@ -167,4 +155,48 @@ public class Miner extends Unit {
             refineryLocations.remove(0);
         }
     }
+
+
+    public void build(RobotType building) throws GameActionException {
+        for(Direction dir : Util.directions){
+            if (tryBuild(building, dir)) {
+                MapLocation Location = rc.getLocation().add(dir);
+                switch(building){
+                    case REFINERY:              comms.broadcastRefnyLocation(Location); break;
+                    case FULFILLMENT_CENTER:    System.out.println("Drones ready to be built"); break;
+                    case DESIGN_SCHOOL:         comms.broadcastDesignSchoolCreation(Location); break;
+                    case VAPORATOR:             comms.broadcastVaporatorLocation(Location); break;
+                    case NET_GUN:               System.out.println("Netgun created"); break;
+                }
+            }
+        }
+    }
 }
+////Refinery
+//        if (turnCount >150) {
+//            if (refineryLocations.size()<1)
+//                for (Direction dir : Util.directions)
+//                    if(tryBuild(RobotType.REFINERY, dir)) {
+//                        MapLocation refnyLoc = rc.getLocation().add(dir);
+//                        comms.broadcastRefnyLocation(refnyLoc);
+//                    }
+//        }
+////Vaporator
+////        if(turnCount>250 && vaporatorLocations.size() == 0) {
+////            System.out.println("Trying to build vaporator");
+////            if (tryBuild(RobotType.VAPORATOR, randomDir)) {
+////                System.out.println("Created a Vaporator");
+////                MapLocation VapeLoc = rc.getLocation().add(randomDir);
+////                comms.broadcastVaporatorLocation(VapeLoc);
+////            }
+////        }
+//
+////Design school
+//        if (turnCount >60 && numDesignSchools < 1 && disToHQ>8) {
+//            if (tryBuild(RobotType.DESIGN_SCHOOL, randomDir))
+//                comms.broadcastDesignSchoolCreation(new MapLocation(randomDir.dx, randomDir.dy));
+//        }
+////NetGun
+////        if (turnCount>80 && numGun<1 && disToHQ>8)
+////            if (tryBuild(RobotType.NET_GUN, randomDir))
+////                numGun++;
