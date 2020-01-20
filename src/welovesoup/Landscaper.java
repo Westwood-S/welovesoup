@@ -39,7 +39,7 @@ public class Landscaper extends Unit {
             }
         }
 
-        if (Math.random() < 0.5){
+        if (Math.random() < 0.8){
             // build the wall
             if (bestPlaceToBuildWall != null) {
                 rc.depositDirt(rc.getLocation().directionTo(bestPlaceToBuildWall));
@@ -49,9 +49,10 @@ public class Landscaper extends Unit {
         }
 
         // otherwise try to get to the hq
-//        if(hqLoc != null){
-//            nav.goTo(hqLoc);
-//        } else {
+        if(hqLoc != null && rc.getRoundNum() < 200){
+            nav.goTo(hqLoc);
+        }
+        // else {
 //            nav.goTo(Util.randomDirection());
 //        }
 
