@@ -40,10 +40,10 @@ public class Miner extends Unit {
 
 
 //Refinery
-        if (turnCount> 150 && disToHQ>35 && refineryLocations.size()<1) {
+        if (turnCount> 100 && disToHQ>35 && refineryLocations.size()<1) {
             System.out.println("Trying Refin"); build(RobotType.REFINERY);   }
 //Design school
-        if (turnCount > 60 && numDesignSchools == 0 && disToHQ>4) {
+        if (turnCount > 60 && numDesignSchools == 0 && (disToHQ<=17 && disToHQ>8 && disToHQ!=9 && disToHQ!=13 && disToHQ!=18)) {
             System.out.println("Trying School"); build(RobotType.DESIGN_SCHOOL); }
 //Vaporator
 //        if(turnCount> 250 && Soup > 500 && vaporatorLocations.size() == 0 && disToHQ> 4){
@@ -67,18 +67,14 @@ public class Miner extends Unit {
 //----------------------------------Searching for --------------------------------
  //Refinery
         for (Direction dir : Util.directions)
-            if (tryRefine(dir)){
-                MapLocation refnyLoc = rc.getLocation().add(dir);
-                //if (refnyLoc != hqLoc && !refineryLocations.contains(refnyLoc))
-                //    comms.broadcastRefnyLocation(refnyLoc);
-            }
+            tryRefine(dir);
 //Soup
         for (Direction dir : Util.directions)
             if (tryMine(dir)) {
                 MapLocation soupLoc = rc.getLocation().add(dir);
                 if (!soupLocations.contains(soupLoc))
                     comms.broadcastSoupLocation(soupLoc);
-                if (turnCount>150)
+                if (turnCount>80)
                      if(tryBuild(RobotType.REFINERY, randomDir)) {
                         MapLocation refnyLoc = rc.getLocation().add(randomDir);
                         comms.broadcastRefnyLocation(refnyLoc);
@@ -86,11 +82,15 @@ public class Miner extends Unit {
             }
 
 //------------------------------Nav-----------------------------------
-        if (turnCount>200) {
-            if (soupLocations.size() > 0) 
+        if (turnCount>150) {
+            if (rc.getSoupCarrying() == RobotType.MINER.soupLimit){
+                if (refineryLocations.size() == 0)
+                    nav.goTo(randomDir);
+                else 
+                    nav.goTo(refineryLocations.get(0));
+            }
+            else if (soupLocations.size() > 0) 
                 nav.goTo(soupLocations.get(0));
-            else if (rc.getSoupCarrying() == RobotType.MINER.soupLimit && refineryLocations.size() > 0)
-                nav.goTo(refineryLocations.get(0));
             else 
                 if (nav.goTo(randomDir))
                     System.out.println("I moved randomly!");
