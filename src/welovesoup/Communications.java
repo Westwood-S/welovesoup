@@ -129,7 +129,7 @@ public class Communications {
         message[3] = loc.y; // y coord of HQ
         if (rc.canSubmitTransaction(message, 3)) {
             rc.submitTransaction(message, 3);
-            broadcastedCreationFulfillmentCenter = true;
+            //broadcastedCreationFulfillmentCenter = true;
         }
     }
 
