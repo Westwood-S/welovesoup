@@ -51,7 +51,7 @@ public class Miner extends Unit {
         }
 //Design school
 
-        if (turnCount>180 && numDesignSchools == 0 && rc.getLocation().distanceSquaredTo(hqLoc)>3) {
+        if (turnCount >180 && numDesignSchools <= 2 && rc.getLocation().distanceSquaredTo(hqLoc)>8) {
             if(tryBuild(RobotType.DESIGN_SCHOOL, randomDir))
                 System.out.println("created a design school");
         }
@@ -72,8 +72,17 @@ public class Miner extends Unit {
                     comms.broadcastSoupLocation(soupLoc);
             }
 
-//------------------------------Full of Soup-----------------------------------
-        if (rc.getSoupCarrying() == RobotType.MINER.soupLimit) {
+//------------------------------Nav-----------------------------------
+        if (numDesignSchools >= 3) {
+            if (soupLocations.size() > 0) 
+                nav.goTo(soupLocations.get(0));
+            else if (refineryLocations.size() > 0)
+                nav.goTo(refineryLocations.get(0));
+            else 
+                if (nav.goTo(randomDir))
+                    System.out.println("I moved randomly!");
+        }
+        else if (rc.getSoupCarrying() == RobotType.MINER.soupLimit) {
             // time to go back to the HQ
             if (numDesignSchools==0 || refineryLocations.size()==0)
                 if(nav.goTo(hqLoc))
