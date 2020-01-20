@@ -17,6 +17,7 @@ public class FulfillmentCenter extends Building {
         comms.broadcastFulfillmentCenterCreation(rc.getLocation());
         //while(numOfLandscapers < 5) {
         for (Direction dir : Util.directions) {
+            System.out.println("***150***");
             if(rc.getTeamSoup() >= 150) {
                 System.out.println(rc.getTeamSoup());
                 System.out.println("***150***");
