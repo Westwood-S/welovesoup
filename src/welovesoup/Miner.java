@@ -22,36 +22,38 @@ public class Miner extends Unit {
         
         numDesignSchools += comms.getNewDesignSchoolCount();
         soupLocations.addAll(Arrays.asList(rc.senseNearbySoup()));
-        comms.updateSoupLocations(soupLocations);
+        comms.updateSoupLocations(soupLocations); //System.out.println("Soup locations: " + soupLocations.size()); //Debugging purpose
         comms.updateRefnyLocations(refineryLocations);
         comms.updateVaporatorLocations(vaporatorLocations);
-        System.out.println("Vaporator Locations:" + vaporatorLocations);
         checkSoup();
         checkRefny();
 
         Direction randomDir = Util.randomDirection();
 //---------------------------------------Trying to build------------------------------------
 //Refinery
-        if (turnCount>230) {
-            if (refineryLocations.size()<1)
+        if (turnCount>150 && refineryLocations.size()<1) {
+            while(rc.getLocation().distanceSquaredTo(hqLoc)<45) {
+                rc.move(randomDir);
+            }
                 for (Direction dir : Util.directions)
-                    if(tryBuild(RobotType.REFINERY, dir)) {
+                    if (tryBuild(RobotType.REFINERY, dir)) {
                         MapLocation refnyLoc = rc.getLocation().add(dir);
                         comms.broadcastRefnyLocation(refnyLoc);
                     }
         }
-//Vaporator
-        if(turnCount>250 && vaporatorLocations.size() == 0) {
-            System.out.println("Trying to build vaporator");
-            if (tryBuild(RobotType.VAPORATOR, randomDir)) {
-                System.out.println("Created a Vaporator");
-                MapLocation VapeLoc = rc.getLocation().add(randomDir);
-                comms.broadcastVaporatorLocation(VapeLoc);
-            }
-        }
+        //if (turnCount > 50 &&
+////Vaporator
+//        if(turnCount>250 && vaporatorLocations.size() == 0) {
+//            System.out.println("Trying to build vaporator");
+//            if (tryBuild(RobotType.VAPORATOR, randomDir)) {
+//                System.out.println("Created a Vaporator");
+//                MapLocation VapeLoc = rc.getLocation().add(randomDir);
+//                comms.broadcastVaporatorLocation(VapeLoc);
+//            }
+//        }
 //Design school
 
-        if (turnCount>180 && numDesignSchools == 0 && rc.getLocation().distanceSquaredTo(hqLoc)>3) {
+        if (turnCount>180 && numDesignSchools == 0 && rc.getLocation().distanceSquaredTo(hqLoc)>4) {
             if(tryBuild(RobotType.DESIGN_SCHOOL, randomDir))
                 System.out.println("created a design school");
         }
@@ -123,10 +125,12 @@ public class Miner extends Unit {
     void checkSoup() throws GameActionException {
         if (soupLocations.size() > 0) {
             MapLocation whereTheyGo = soupLocations.get(0);
-            if (rc.canSenseLocation(whereTheyGo)
-                    && rc.senseSoup(whereTheyGo) == 0) {
+            if (rc.canSenseLocation(whereTheyGo) && rc.senseSoup(whereTheyGo) == 0) {
                 soupLocations.remove(0);
             }
+        }
+        if(soupLocations.contains(rc.getLocation()) && rc.senseSoup(rc.getLocation()) == 0){
+            soupLocations.clear();
         }
     }
     void checkRefny() throws GameActionException {
