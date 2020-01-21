@@ -170,16 +170,17 @@ public class Communications {
         }
     }
 
-    public void broadcastNotSorrounded() throws GameActionException{
+    public void broadcastNotSurrounded() throws GameActionException{
         int[] message = new int[7];
         message[0] = teamSecret;
         message[1] = 6;
         if(rc.canSubmitTransaction(message, 3)){
             rc.submitTransaction(message, 3);
+            System.out.println("Not sorrounded!!");
         }
     }
 
-    public boolean updateSorrounded() throws GameActionException {
+    public boolean updateSurrounded() throws GameActionException {
         for (Transaction tx : rc.getBlock(rc.getRoundNum() - 1)) {
             int[] mess = tx.getMessage();
             if (mess[0] == teamSecret && mess[1] == 6) {

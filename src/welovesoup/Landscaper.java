@@ -4,7 +4,7 @@ import battlecode.common.*;
 public class Landscaper extends Unit {
     int dirtCarrying = 0;
     boolean nextToHQ = false;
-    boolean sorrounded = true;
+    boolean surrounded = true;
 
     public Landscaper(RobotController r) {
         super(r);
@@ -14,9 +14,7 @@ public class Landscaper extends Unit {
         super.takeTurn();
         dirtCarrying = rc.getDirtCarrying();
         nextToHQ = rc.getLocation().isAdjacentTo(hqLoc);
-        if( turnCount <= 203 && turnCount >= 200){
-            sorrounded = comms.updateSorrounded();
-        }
+        surrounded = comms.updateSurrounded();
         if (hqLoc != null && nextToHQ) {
             Direction dirtohq = rc.getLocation().directionTo(hqLoc);
             if(rc.canDigDirt(dirtohq)){
@@ -30,7 +28,7 @@ public class Landscaper extends Unit {
             }
         }
         if (nextToHQ && dirtCarrying > 0 ){
-            if(!sorrounded){
+            if(!surrounded){
                 MapLocation bestPlaceToBuildWall = null;
                 //find best place to build
                 int lowestElevation = 9999999;
