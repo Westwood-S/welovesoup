@@ -7,6 +7,8 @@ import battlecode.common.RobotType;
 
 public class FulfillmentCenter extends Building {
 
+    int numDrone=0;
+
     public FulfillmentCenter(RobotController r) {
         super(r);
     }
@@ -15,18 +17,17 @@ public class FulfillmentCenter extends Building {
         super.takeTurn();
         // will only actually happen if we haven't already broadcasted the creation
         comms.broadcastFulfillmentCenterCreation(rc.getLocation());
-        //while(numOfLandscapers < 5) {
-        for (Direction dir : Util.directions) {
-            System.out.println("***150***");
-            if(rc.getTeamSoup() >= 150) {
-                System.out.println(rc.getTeamSoup());
-                System.out.println("***150***");
-            }
+        Direction dir = Util.randomDirection();
+        while (numDrone<5) {
+            //for (Direction dir : Util.directions) {
+                while (!tryBuild(RobotType.DELIVERY_DRONE, dir)) {
+                    dir = Util.randomDirection();
+                }
+                    numDrone++;
 
-            if (tryBuild(RobotType.DELIVERY_DRONE, dir)) {
                 System.out.println("made a delivery drone");
-            }
+                //dir = Util.randomDirection();
+            //}
         }
-        //}
     }
 }

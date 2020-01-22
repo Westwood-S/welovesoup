@@ -1,8 +1,10 @@
 package welovesoup;
 import battlecode.common.*;
-import org.mockito.internal.matchers.Null;
 
 public class Landscaper extends Unit {
+    int dirtCarrying = 0;
+    boolean nextToHQ = false;
+    boolean surrounded = true;
 
     public Landscaper(RobotController r) {
         super(r);
@@ -10,60 +12,104 @@ public class Landscaper extends Unit {
 
     public void takeTurn() throws GameActionException {
         super.takeTurn();
-
-        if (hqLoc != null && hqLoc.isAdjacentTo(rc.getLocation())) {
+        dirtCarrying = rc.getDirtCarrying();
+        nextToHQ = rc.getLocation().isAdjacentTo(hqLoc);
+        surrounded = comms.updateSurrounded();
+        if (hqLoc != null && nextToHQ) {
             Direction dirtohq = rc.getLocation().directionTo(hqLoc);
             if(rc.canDigDirt(dirtohq)){
                 rc.digDirt(dirtohq);
             }
+        } else {
+            if (Math.random() < 0.7) {
+                nav.goTo(Util.randomDirection());
+            } else {
+                nav.goTo(hqLoc);
+            }
         }
-        if(hqLoc != null) {
-            nav.goTo(hqLoc);
-        }
-        if(rc.getDirtCarrying() == 0){
-            //for (Direction dir : Util.directions)
-            tryDig(Util.randomDirection());
-        }
-        MapLocation bestPlaceToBuildWall = null;
-        if(hqLoc != null) {
-            int lowestElevation = 9999999;
-            //MapLocation[] tileNearHQ = {hqLoc.add(Direction.NORTHWEST).add(Direction.NORTHWEST),hqLoc.add(Direction.NORTHWEST).add(Direction.NORTH),hqLoc.add(Direction.NORTH).add(Direction.NORTH),hqLoc.add(Direction.NORTHEAST).add(Direction.NORTH),hqLoc.add(Direction.NORTHEAST).add(Direction.NORTHEAST),hqLoc.add(Direction.EAST).add(Direction.EAST),hqLoc.add(Direction.SOUTHEAST).add(Direction.SOUTHEAST),hqLoc.add(Direction.SOUTH).add(Direction.SOUTH),hqLoc.add(Direction.SOUTHWEST).add(Direction.SOUTHWEST),hqLoc.add(Direction.WEST).add(Direction.WEST)};
-            for (Direction dir : Util.directions) {
-                MapLocation tileToCheck = hqLoc.add(dir);
-                if(rc.getLocation().distanceSquaredTo(tileToCheck) < 2
-                        && rc.canDepositDirt(rc.getLocation().directionTo(tileToCheck))) {
-                    if (rc.senseElevation(tileToCheck) < lowestElevation) {
-                        lowestElevation = rc.senseElevation(tileToCheck);
-                        bestPlaceToBuildWall = tileToCheck;
+        if (nextToHQ && dirtCarrying > 0 ){
+            if(!surrounded){
+                MapLocation bestPlaceToBuildWall = null;
+                //find best place to build
+                int lowestElevation = 9999999;
+                for (Direction dir : Util.directions) {
+                    MapLocation tileToCheck = hqLoc.add(dir);
+                    if(rc.getLocation().distanceSquaredTo(tileToCheck) < 4
+                            && rc.canDepositDirt(rc.getLocation().directionTo(tileToCheck))) {
+                        if (rc.senseElevation(tileToCheck) < lowestElevation) {
+                            lowestElevation = rc.senseElevation(tileToCheck);
+                            bestPlaceToBuildWall = tileToCheck;
+                        }
                     }
                 }
+                if (bestPlaceToBuildWall != null) {
+                    rc.depositDirt(rc.getLocation().directionTo(bestPlaceToBuildWall));
+                    rc.setIndicatorDot(bestPlaceToBuildWall, 0, 255, 0);
+                    System.out.println("wall best fit");
+                }
+
+            } else if(rc.canDepositDirt(Direction.CENTER)) {
+                rc.depositDirt(Direction.CENTER);
+                System.out.println("wall under me");
             }
+        }else if (dirtCarrying == 0 && rc.getLocation().distanceSquaredTo(hqLoc)<=2){
+            tryDig();
         }
-        System.out.println("LANDSCAPER_0.9");
-        if (Math.random() < 0.9){
-            // build the wall
-            if (bestPlaceToBuildWall != null) {
-                rc.depositDirt(rc.getLocation().directionTo(bestPlaceToBuildWall));
-                rc.setIndicatorDot(bestPlaceToBuildWall, 0, 255, 0);
-                System.out.println("build a wall..");
-            }
-        }
-        if (hqLoc == null)
-            hqLoc = comms.getHqLocFromBlockchain();
+
+//        MapLocation bestPlaceToBuildWall = null;
+//         //find best place to build
+//            int lowestElevation = 9999999;
+//            for (Direction dir : Util.directions) {
+//                MapLocation tileToCheck = hqLoc.add(dir);
+//                if(rc.getLocation().distanceSquaredTo(tileToCheck) < 4
+//                        && rc.canDepositDirt(rc.getLocation().directionTo(tileToCheck))) {
+//                    if (rc.senseElevation(tileToCheck) < lowestElevation) {
+//                        lowestElevation = rc.senseElevation(tileToCheck);
+//                        bestPlaceToBuildWall = tileToCheck;
+//                    }
+//                }
+//            }
+//            if (bestPlaceToBuildWall != null) {
+//                rc.depositDirt(rc.getLocation().directionTo(bestPlaceToBuildWall));
+//                rc.setIndicatorDot(bestPlaceToBuildWall, 0, 255, 0);
+//                System.out.println("building a wall");
+//            }
+
         // otherwise try to get to the hq
-        if(hqLoc != null){
-            nav.goTo(hqLoc);
-        } else {
-            nav.goTo(Util.randomDirection());
-        }
+//        if(hqLoc != null && rc.getRoundNum() < 200){
+        //           nav.goTo(hqLoc);
+//        }
+        // else {
+//            nav.goTo(Util.randomDirection());
+//        }
+
     }
 
-    boolean tryDig(Direction dir) throws GameActionException {
+    boolean tryDig() throws GameActionException {
+        Direction dir;
+        if(hqLoc == null){
+            dir = Util.randomDirection();
+        } else {
+            dir = hqLoc.directionTo(rc.getLocation());
+        }
         if(rc.canDigDirt(dir)){
             rc.digDirt(dir);
             rc.setIndicatorDot(rc.getLocation().add(dir), 255, 0, 0);
             return true;
         }
         return false;
+    }
+    MapLocation bestPlaceToBuild() throws GameActionException{
+        int lowestElevation = 9999999;
+        for (Direction dir : Util.directions) {
+            MapLocation tileToCheck = hqLoc.add(dir);
+            if(rc.getLocation().distanceSquaredTo(tileToCheck) < 4 && rc.canDepositDirt(rc.getLocation().directionTo(tileToCheck))) {
+                if (rc.senseElevation(tileToCheck) < lowestElevation) {
+                    lowestElevation = rc.senseElevation(tileToCheck);
+                    return tileToCheck;
+                }
+            }
+        }
+        return null;
     }
 }
