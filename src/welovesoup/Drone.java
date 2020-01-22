@@ -10,7 +10,7 @@ public class Drone extends Unit {
 
     Direction randomDir = Util.randomDirection();
     MapLocation nextLoc = null;
-    MapLocation origin = new MapLocation(15, 15);
+    MapLocation origin = new MapLocation(25, 15);
     MapLocation opponentHQ = null;
     MapLocation target = null;
     RobotInfo[] robotInfos = null;
