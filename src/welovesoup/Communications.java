@@ -18,6 +18,7 @@ public class Communications {
         "refinery created",                                 // 3
         "fullfillment center created",                      // 4
         "vaporator created",                                // 5
+        "Not sorrounded",                                   // 6
     };
 
     public Communications(RobotController r) {
@@ -76,18 +77,7 @@ public class Communications {
         return count;
     }
 
-    public int getNewFulfillmentCenterCount() throws GameActionException {
-        int count = 0;
-        for(Transaction tx : rc.getBlock(rc.getRoundNum() - 1)) {
-            int[] mess = tx.getMessage();
-            if(mess[0] == teamSecret && mess[1] == 4) {
-                System.out.println("heard about a cool new fulfillment center");
-                count += 1;
-            }
-        }
-        return count;
-    }
-
+    
     public void broadcastSoupLocation(MapLocation loc ) throws GameActionException {
         int[] message = new int[7];
         message[0] = teamSecret;
@@ -145,6 +135,19 @@ public class Communications {
         }
     }
 
+    public int getNewFulfillmentCenterCount() throws GameActionException {
+        int count = 0;
+        for(Transaction tx : rc.getBlock(rc.getRoundNum() - 1)) {
+            int[] mess = tx.getMessage();
+            if(mess[0] == teamSecret && mess[1] == 4) {
+                System.out.println("heard about a cool new fulfillment center");
+                count += 1;
+            }
+        }
+        return count;
+    }
+
+
     public void broadcastVaporatorLocation(MapLocation loc) throws GameActionException {
         int[] message = new int[7];
         message[0] = teamSecret;
@@ -165,6 +168,27 @@ public class Communications {
                 vaporatorLocations.add(new MapLocation(mess[2], mess[3]));
             }
         }
+    }
+
+    public void broadcastNotSurrounded() throws GameActionException{
+        int[] message = new int[7];
+        message[0] = teamSecret;
+        message[1] = 6;
+        if(rc.canSubmitTransaction(message, 3)){
+            rc.submitTransaction(message, 3);
+            System.out.println("Not sorrounded!!");
+        }
+    }
+
+    public boolean updateSurrounded() throws GameActionException {
+        for (Transaction tx : rc.getBlock(rc.getRoundNum() - 1)) {
+            int[] mess = tx.getMessage();
+            if (mess[0] == teamSecret && mess[1] == 6) {
+                System.out.println("NOT SORROUNDED");
+                return false;
+            }
+        }
+        return true;
     }
 }
 
