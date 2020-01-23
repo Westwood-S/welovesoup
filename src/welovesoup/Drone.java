@@ -71,15 +71,20 @@ public class Drone extends Unit {
                         rc.pickUpUnit(r.getID());
                 } else {
                     System.out.println("move randomly or towards HQ");
-                    MapLocation rand_dir = rc.getLocation().add(Util.randomDirection());
-                    if(opponentHQ != null && rand_dir.distanceSquaredTo(opponentHQ) > GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED) {
-                        checkRobots(rc.senseNearbyRobots());
-                        nav.goTo(rand_dir);
-                    } else if (opponentHQ != null && rand_dir.distanceSquaredTo(opponentHQ) < GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED) {
-                        checkRobots(rc.senseNearbyRobots());
-                        nav.goTo(rc.getLocation().directionTo(hqLoc));
-                    } else
-                        nav.goTo(rand_dir);
+//                    MapLocation rand_dir = rc.getLocation().add(Util.randomDirection());
+//                    if(opponentHQ != null && rand_dir.distanceSquaredTo(opponentHQ) > GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED) {
+//                        checkRobots(rc.senseNearbyRobots());
+//                        nav.goTo(rand_dir);
+//                    } else if (opponentHQ != null && rand_dir.distanceSquaredTo(opponentHQ) < GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED) {
+//                        checkRobots(rc.senseNearbyRobots());
+//                        nav.goTo(rc.getLocation().directionTo(hqLoc));
+//                    } else
+//                        nav.goTo(rand_dir);
+                    droneFly(Direction.SOUTH);
+                    droneFly(Direction.WEST);
+                    droneFly(Direction.NORTH);
+                    droneFly(Direction.EAST);
+                    //rotateAround(origin, 5);
                 }
             }
         } else {
@@ -91,12 +96,61 @@ public class Drone extends Unit {
                 checkRobots(rc.senseNearbyRobots());
                 nav.goTo(hqLoc);
             } else {
-                System.out.println("move randomly");
+                System.out.println("drone not move randomly; drone is flying now :)");
                 checkRobots(rc.senseNearbyRobots());
-                nav.goTo(Util.randomDirection());
-                rotateAround(origin, 5);
+                //droneFly();
+                //nav.goTo(Util.randomDirection());
+                //origin.add(Direction.WEST);
+                //rotateAround(origin, 5);
             }
         }
+    }
+
+    public void droneFly(Direction dir) throws GameActionException {
+//        int count = 0;
+        //if(dir == Direction.SOUTH) {
+        MapLocation target = new MapLocation(34, 5);
+        if(dir == Direction.SOUTH) {
+            while (!rc.getLocation().isAdjacentTo(new MapLocation(34, 5))) {
+                checkRobots(rc.senseNearbyRobots());
+                nav.goTo(target);
+            }
+        } else if (dir == Direction.WEST){
+            target = new MapLocation(5,5);
+            while (!rc.getLocation().isAdjacentTo(target)) {
+                checkRobots(rc.senseNearbyRobots());
+                nav.goTo(target);
+            }
+        } else if (dir == Direction.NORTH){
+            target = new MapLocation(5,21);
+            while (!rc.getLocation().isAdjacentTo(target)) {
+                checkRobots(rc.senseNearbyRobots());
+                nav.goTo(target);
+            }
+        } else if (dir == Direction.EAST){
+            target = new MapLocation(35,25);
+            while (!rc.getLocation().isAdjacentTo(target)) {
+                checkRobots(rc.senseNearbyRobots());
+                nav.goTo(target);
+            }
+        }
+//            count = 0;
+//            while(count<5) {
+//                checkRobots(rc.senseNearbyRobots());
+//                nav.tryMove(dir);
+//                count++;
+//            }
+//            System.out.println("drone moved SOUTH");
+//        } else {
+//            count = 0;
+//            while(count<5) {
+//                checkRobots(rc.senseNearbyRobots());
+//                nav.tryMove(dir);
+//                count++;
+//            }
+//            nav.tryMove(dir);
+//            System.out.println("drone moved" + dir.toString());
+//        }
     }
 
     public void rotateAround(MapLocation target, int radius) throws GameActionException {
@@ -154,16 +208,17 @@ public class Drone extends Unit {
                     }
                     if (rc.canPickUpUnit(r.getID()))
                         rc.pickUpUnit(r.getID());
-                } else {
-                    System.out.println("move randomly or towards HQ");
-                    MapLocation rand_dir = rc.getLocation().add(Util.randomDirection());
-                    if (opponentHQ != null && rand_dir.distanceSquaredTo(opponentHQ) > GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED)
-                        nav.goTo(rand_dir);
-                    else if (opponentHQ != null && rand_dir.distanceSquaredTo(opponentHQ) < GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED)
-                        nav.goTo(rc.getLocation().directionTo(hqLoc));
-                    else
-                        nav.goTo(rand_dir);
                 }
+//                else {
+//                    System.out.println("move randomly or towards HQ");
+//                    MapLocation rand_dir = rc.getLocation().add(Util.randomDirection());
+//                    if (opponentHQ != null && rand_dir.distanceSquaredTo(opponentHQ) > GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED)
+//                        nav.goTo(rand_dir);
+//                    else if (opponentHQ != null && rand_dir.distanceSquaredTo(opponentHQ) < GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED)
+//                        nav.goTo(rc.getLocation().directionTo(hqLoc));
+//                    else
+//                        nav.goTo(rand_dir);
+//                }
             }
         }
     }
