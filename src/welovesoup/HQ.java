@@ -15,7 +15,7 @@ public class HQ extends Shooter {
     public void takeTurn() throws GameActionException {
         super.takeTurn();
         //System.out.println("Soup Locations:" + rc.senseNearbySoup());
-        if(turnCount >= 200 && turnCount <= 202 && !AllLandScapers(rc.senseNearbyRobots(4, team))) {
+        if(turnCount >= 230 && turnCount <= 232 && !AllLandScapers(rc.senseNearbyRobots(4, team))) {
             comms.broadcastNotSurrounded();
             System.out.println("Not sorrounded");
         }

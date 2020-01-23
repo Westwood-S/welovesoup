@@ -4,7 +4,7 @@ import battlecode.common.*;
 public class Landscaper extends Unit {
     int dirtCarrying = 0;
     boolean nextToHQ = false;
-    boolean surrounded = true;
+    public boolean surrounded = true;
 
     public Landscaper(RobotController r) {
         super(r);
@@ -12,9 +12,13 @@ public class Landscaper extends Unit {
 
     public void takeTurn() throws GameActionException {
         super.takeTurn();
+       // System.out.println(turnCount);
         dirtCarrying = rc.getDirtCarrying();
         nextToHQ = rc.getLocation().isAdjacentTo(hqLoc);
-        surrounded = comms.updateSurrounded();
+
+        if(rc.getRoundNum() >= 230 && rc.getRoundNum() <= 232)
+            if(comms.updateSurrounded() == 0) surrounded = false;
+
         if (hqLoc != null && nextToHQ) {
             Direction dirtohq = rc.getLocation().directionTo(hqLoc);
             if(rc.canDigDirt(dirtohq)){
@@ -33,18 +37,20 @@ public class Landscaper extends Unit {
                 //find best place to build
                 int lowestElevation = 9999999;
                 for (Direction dir : Util.directions) {
-                    MapLocation tileToCheck = hqLoc.add(dir);
-                    if(rc.getLocation().distanceSquaredTo(tileToCheck) < 4
-                            && rc.canDepositDirt(rc.getLocation().directionTo(tileToCheck))) {
-                        if (rc.senseElevation(tileToCheck) < lowestElevation) {
-                            lowestElevation = rc.senseElevation(tileToCheck);
-                            bestPlaceToBuildWall = tileToCheck;
+                    if(dir != Direction.CENTER) {
+                        MapLocation tileToCheck = hqLoc.add(dir);
+                        if (rc.getLocation().distanceSquaredTo(tileToCheck) < 4
+                                && rc.canDepositDirt(rc.getLocation().directionTo(tileToCheck))) {
+                            if (rc.senseElevation(tileToCheck) < lowestElevation) {
+                                lowestElevation = rc.senseElevation(tileToCheck);
+                                bestPlaceToBuildWall = tileToCheck;
+                            }
                         }
                     }
                 }
                 if (bestPlaceToBuildWall != null) {
                     rc.depositDirt(rc.getLocation().directionTo(bestPlaceToBuildWall));
-                    rc.setIndicatorDot(bestPlaceToBuildWall, 0, 255, 0);
+//                    rc.setIndicatorDot(bestPlaceToBuildWall, 0, 255, 0);
                     System.out.println("wall best fit");
                 }
 
