@@ -53,7 +53,7 @@ public class Miner extends Unit {
 //            System.out.println("Trying gun"); build(RobotType.NET_GUN); }
 
 // Fulfillment Center
-        if (turnCount >300 && numFulfillmentCenters < 1) { // && disToHQ>1) {
+        if (turnCount >300 && numFulfillmentCenters < 1 && numDesignSchools>0) { // && disToHQ>1) {
             randomDir = Util.randomDirection();
             while(!tryBuild(RobotType.FULFILLMENT_CENTER, randomDir)) {
                 randomDir = Util.randomDirection();
@@ -82,7 +82,7 @@ public class Miner extends Unit {
             }
 
 //------------------------------Nav-----------------------------------
-        if (turnCount>150) {
+        if (turnCount>100) {
             if (rc.getSoupCarrying() == RobotType.MINER.soupLimit){
                 if (refineryLocations.size() == 0)
                     nav.goTo(randomDir);

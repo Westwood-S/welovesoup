@@ -15,8 +15,8 @@ public class HQ extends Shooter {
     public void takeTurn() throws GameActionException {
         super.takeTurn();
         //System.out.println("Soup Locations:" + rc.senseNearbySoup());
-        if(turnCount > 200 && turnCount < 300 && !AllLandScapers(rc.senseNearbyRobots(4, team))) {
-            comms.broadcastNotSorrounded();
+        if(turnCount >= 200 && turnCount <= 202 && !AllLandScapers(rc.senseNearbyRobots(4, team))) {
+            comms.broadcastNotSurrounded();
             System.out.println("Not sorrounded");
         }
         if(numMiners < 4) {
@@ -28,10 +28,19 @@ public class HQ extends Shooter {
     }
 
     boolean AllLandScapers(RobotInfo[] robots){
-        if(robots.length < 8) return false;
+        if(robots.length < 8) {
+            System.out.println("There wasn't enough " + robots.length);
+            return false;
+        }
         for(RobotInfo rob : robots){
-          if(rob.getTeam() != team) return false;
-          if(rob.getType() != RobotType.LANDSCAPER) return false;
+          if(rob.getTeam() != team){
+              System.out.println("They weren't from out team: " + rob.getTeam());
+              return false;
+          }
+          if(rob.getType() != RobotType.LANDSCAPER){
+              System.out.println("They were: " + rob.getType());
+              return false;
+          }
         }
         return true;
     }
