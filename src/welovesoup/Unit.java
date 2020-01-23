@@ -1,10 +1,13 @@
 package welovesoup;
 import battlecode.common.*;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 public class Unit extends Robot {
 
     Navigation nav;
-
+    Queue<MapLocation> previousLocations = new LinkedList<MapLocation>();
     MapLocation hqLoc;
 
     public Unit(RobotController r) {
@@ -14,8 +17,12 @@ public class Unit extends Robot {
 
     public void takeTurn() throws GameActionException {
         super.takeTurn();
-        
-        findHQ();
+        previousLocations.add(rc.getLocation());
+        if(previousLocations.size() > 7){
+            previousLocations.remove();
+        }
+        if(turnCount < 5)
+            findHQ();
     }
 
     public void findHQ() throws GameActionException {

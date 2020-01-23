@@ -180,15 +180,16 @@ public class Communications {
         }
     }
 
-    public boolean updateSurrounded() throws GameActionException {
+    public int  updateSurrounded() throws GameActionException {
         for (Transaction tx : rc.getBlock(rc.getRoundNum() - 1)) {
             int[] mess = tx.getMessage();
+            if(mess == null) return -1;
             if (mess[0] == teamSecret && mess[1] == 6) {
                 System.out.println("NOT SORROUNDED");
-                return false;
+                return 0;
             }
         }
-        return true;
+        return 1;
     }
 }
 
