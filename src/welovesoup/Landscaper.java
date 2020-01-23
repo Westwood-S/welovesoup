@@ -14,9 +14,11 @@ public class Landscaper extends Unit {
         super.takeTurn();
         dirtCarrying = rc.getDirtCarrying();
         nextToHQ = rc.getLocation().isAdjacentTo(hqLoc);
-        if( turnCount <= 203 && turnCount >= 200){
+
+        if( turnCount <= 300 && turnCount >= 200){
             sorrounded = comms.updateSorrounded();
         }
+
         if (hqLoc != null && nextToHQ) {
             Direction dirtohq = rc.getLocation().directionTo(hqLoc);
             if(rc.canDigDirt(dirtohq)){
