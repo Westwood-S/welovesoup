@@ -61,7 +61,7 @@ public class Miner extends Unit {
 //            System.out.println("Trying gun"); build(RobotType.NET_GUN); }
 
 // Fulfillment Center cost 150
-        if(rc.getRoundNum() > 300 && Soup >= 150 && numFulfillmentCenters < 1 && numLandScapers > 8 ){
+        if(rc.getRoundNum() > 300 && Soup >= 150 && numFulfillmentCenters < 1 && numLandScapers >= 8 ){
             System.out.println("Drone facility in progress"); build(RobotType.FULFILLMENT_CENTER); }
 
 //----------------------------------Searching for --------------------------------
