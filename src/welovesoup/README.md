@@ -1,18 +1,3 @@
-# Objects 
-{Worker,
-Landscaper,
-Drone,
-drone carring object???,
-Refinery,
-Vaporator,
-HQ,
-Design School,
-Fulfillment Center,
-net gun?}
-
-
-
-
 # lectureplayer
 example player for battlecode 2020
 

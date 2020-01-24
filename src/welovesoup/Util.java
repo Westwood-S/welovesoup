@@ -13,7 +13,8 @@ public class Util {
         Direction.SOUTH,
         Direction.SOUTHWEST,
         Direction.WEST,
-        Direction.NORTHWEST
+        Direction.NORTHWEST,
+        Direction.CENTER,
     };
 
     /**
@@ -21,7 +22,6 @@ public class Util {
      *
      * @return a random Direction
      */
-    static Direction randomDirection() {
-        return directions[(int) (Math.random() * directions.length)];
-    }
+    //.length -1 so that we can never get center.
+    static Direction randomDirection() { return directions[(int) (Math.random() * directions.length-1)]; }
 }

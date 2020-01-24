@@ -10,12 +10,12 @@ public class Shooter extends Building {
     public void takeTurn() throws GameActionException {
         super.takeTurn();
 
-        RobotInfo[] robots = rc.senseNearbyRobots(GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED,rc.getTeam().opponent());
+        RobotInfo[] robots = rc.senseNearbyRobots(5,rc.getTeam().opponent());
         for (RobotInfo robot : robots) {
-            if (robot.type == RobotType.LANDSCAPER || robot.type == RobotType.DELIVERY_DRONE || robot.type == RobotType.NET_GUN || robot.type == RobotType.MINER) {
+            if (robot.type == RobotType.LANDSCAPER || robot.type == RobotType.DESIGN_SCHOOL || robot.type == RobotType.MINER || robot.type == RobotType.DELIVERY_DRONE) {
                 if (rc.canShootUnit(robot.ID)) {
                     rc.shootUnit(robot.ID);
-                    break;
+                    rc.setIndicatorLine(rc.getLocation(), robot.location, 255, 255, 0);
                 }
             }
         }
