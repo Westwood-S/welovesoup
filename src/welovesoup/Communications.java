@@ -19,6 +19,7 @@ public class Communications {
         "fullfillment center created",                      // 4
         "vaporator created",                                // 5
         "Not sorrounded",                                   // 6
+        "Has enemy"                                         // 7 
     };
 
     public Communications(RobotController r) {
@@ -180,7 +181,7 @@ public class Communications {
         }
     }
 
-    public int  updateSurrounded() throws GameActionException {
+    public int updateSurrounded() throws GameActionException {
         for (Transaction tx : rc.getBlock(rc.getRoundNum() - 1)) {
             int[] mess = tx.getMessage();
             if(mess == null) return -1;
@@ -190,6 +191,28 @@ public class Communications {
             }
         }
         return 1;
+    }
+
+    public void broadcastHasEnemy() throws GameActionException{
+        int[] message = new int[7];
+        message[0] = teamSecret;
+        message[1] = 7;
+        if(rc.canSubmitTransaction(message, 3)){
+            rc.submitTransaction(message, 3);
+            System.out.println("HELP OMG!!!");
+        }
+    }
+
+    public int updateHasEnemy() throws GameActionException {
+        for (Transaction tx : rc.getBlock(rc.getRoundNum() - 1)) {
+            int[] mess = tx.getMessage();
+            if (mess == null) return -1;
+            if (mess[0] == teamSecret && mess[1] == 7) {
+                System.out.println("WHY EVERYBODY RUSH");
+                return 1;
+            }
+        }
+        return 0;
     }
 }
 
