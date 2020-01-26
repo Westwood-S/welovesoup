@@ -54,7 +54,7 @@ public class Miner extends Unit {
         if (rc.getRoundNum()> 100 && Soup >= 200 && disToHQ>53 && refineryLocations.size()==0) {
            build(RobotType.REFINERY);   }
 //Design school cost 150
-        if (rc.getRoundNum() > 60 && Soup >= 150 && numDesignSchools == 0 && (disToHQ<=17 && disToHQ>4 && disToHQ!=9 && disToHQ!=13 && disToHQ!=18)) {
+        if (rc.getRoundNum() > 60 && Soup >= 150 && numDesignSchools == 0 && (disToHQ<=17 && disToHQ>6 && disToHQ!=9 && disToHQ!=13 && disToHQ!=18)) {
             System.out.println("Trying School"); build(RobotType.DESIGN_SCHOOL); }
 //Vaporator cost 500
 //        if(rc.getRoundNum()> 100 && Soup >= 500 && disToHQ> 4){
