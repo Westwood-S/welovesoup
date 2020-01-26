@@ -2,6 +2,7 @@ package welovesoup;
 import battlecode.common.*;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class Landscaper extends Unit {
     int dirtCarrying = 0;
@@ -49,7 +50,7 @@ public class Landscaper extends Unit {
                         }
                     }
                 }
-                if (bestPlaceToBuildWall != null) {
+                if (bestPlaceToBuildWall != null && rc.senseRobotAtLocation(bestPlaceToBuildWall).getType() != RobotType.LANDSCAPER) {
                     rc.depositDirt(rc.getLocation().directionTo(bestPlaceToBuildWall));
 //                    rc.setIndicatorDot(bestPlaceToBuildWall, 0, 255, 0);
                     System.out.println("wall best fit");
@@ -71,12 +72,15 @@ public class Landscaper extends Unit {
         } else {
             dir = hqLoc.directionTo(rc.getLocation());
         }
-        if(rc.canDigDirt(dir) && !rc.isLocationOccupied(rc.adjacentLocation(dir))){
-            rc.digDirt(dir);
-            rc.setIndicatorDot(rc.getLocation().add(dir), 255, 0, 0);
-            return true;
+        for(Direction dire : Util.directions) {
+            if(dire != Direction.CENTER && !rc.getLocation().add(dire).isAdjacentTo(hqLoc)) {
+                if (rc.canDigDirt(dire) && !rc.isLocationOccupied(rc.adjacentLocation(dire))) {
+                    rc.digDirt(dire);
+                    rc.setIndicatorDot(rc.getLocation().add(dire), 255, 0, 0);
+                    return true;
+                }
+            }
         }
         return false;
     }
-
 }
