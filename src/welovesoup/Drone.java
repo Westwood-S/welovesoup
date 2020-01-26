@@ -97,6 +97,10 @@ public class Drone extends Unit {
                 System.out.println("drone is flying now :)");
                 checkRobots(rc.senseNearbyRobots());
                 droneFly(Direction.SOUTH);
+                droneFly(Direction.WEST);
+                droneFly(Direction.NORTH);
+                droneFly(Direction.EAST);
+                nav.goTo(hqLoc);
             }
         }
     }
