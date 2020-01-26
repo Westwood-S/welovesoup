@@ -14,13 +14,11 @@ public class HQ extends Shooter {
 
     public void takeTurn() throws GameActionException {
         super.takeTurn();
-        //System.out.println("Soup Locations:" + rc.senseNearbySoup());
         if(turnCount >= 430 && turnCount <= 432 && !AllLandScapers(rc.senseNearbyRobots(4, team))) {
             comms.broadcastNotSurrounded();
             System.out.println("Not sorrounded");
         }
-        if(numMiners < 4) {
-            //for (Direction dir : Util.directions)
+        if(numMiners < 6) {
             if (tryBuild(RobotType.MINER, Util.randomDirection())) {
                 numMiners++;
             }
