@@ -31,8 +31,8 @@ public class Communications {
         message[1] = 0;
         message[2] = loc.x; // x coord of HQ
         message[3] = loc.y; // y coord of HQ
-        if (rc.canSubmitTransaction(message, 3))
-            rc.submitTransaction(message, 3);
+        if (rc.canSubmitTransaction(message, 1))
+            rc.submitTransaction(message, 1);
     }
 
     public MapLocation getHqLocFromBlockchain() throws GameActionException {
@@ -57,8 +57,8 @@ public class Communications {
         message[1] = 1;
         message[2] = loc.x; // x coord of HQ
         message[3] = loc.y; // y coord of HQ
-        if (rc.canSubmitTransaction(message, 3)) {
-            rc.submitTransaction(message, 3);
+        if (rc.canSubmitTransaction(message, 1)) {
+            rc.submitTransaction(message, 1);
             broadcastedCreation = true;
         }
     }
@@ -84,8 +84,8 @@ public class Communications {
         message[1] = 2;
         message[2] = loc.x; // x coord of HQ
         message[3] = loc.y; // y coord of HQ
-        if (rc.canSubmitTransaction(message, 3)) {
-            rc.submitTransaction(message, 3);
+        if (rc.canSubmitTransaction(message, 2)) {
+            rc.submitTransaction(message, 2);
             System.out.println("new soup!" + loc);
         }
     }
