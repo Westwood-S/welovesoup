@@ -240,5 +240,19 @@ public class Communications {
             return false;
         }
     }
+
+    public boolean getDigLocations(ArrayList<MapLocation> locations) throws GameActionException {
+        for (Transaction tx : rc.getBlock(rc.getRoundNum() - 1)) {
+            int[] mess = tx.getMessage();
+            if(mess == null) return false;
+            if (mess[0] == teamSecret) {
+               if(mess[1] > 10){
+                   
+
+               }
+            }
+        }
+        return false;
+    }
 }
 

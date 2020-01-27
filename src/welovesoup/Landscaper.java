@@ -7,21 +7,27 @@ import java.util.Map;
 public class Landscaper extends Unit {
     int dirtCarrying = 0;
     boolean nextToHQ = false;
-    public boolean surrounded = true;
+    public int surrounded = -10;
     ArrayList<MapLocation> digLocations= new ArrayList<MapLocation>();
+
     public Landscaper(RobotController r) {
         super(r);
+//        digLocations.add(hqLoc.translate(2, 0 ));
+//        digLocations.add(hqLoc.translate(-2, 0));
+//        digLocations.add(hqLoc.translate(0, 2));
+//        digLocations.add(hqLoc.translate(0, -2));
     }
+
 
     public void takeTurn() throws GameActionException {
         super.takeTurn();
         dirtCarrying = rc.getDirtCarrying();
         nextToHQ = rc.getLocation().isAdjacentTo(hqLoc);
 
-        if(rc.getRoundNum() >= 430 && rc.getRoundNum() <= 432)
-            if(comms.updateSurrounded() == 0) surrounded = false;
+        if(rc.getRoundNum() >= 430 && rc.getRoundNum() <= 432 || rc.getRoundNum() > 500 && rc.getRoundNum() % 50 == 1)
+            surrounded = comms.updateSurrounded();
 
-        if (hqLoc != null && nextToHQ) {
+        if (hqLoc != null && nextToHQ && dirtCarrying < RobotType.LANDSCAPER.dirtLimit) {
             Direction dirtohq = rc.getLocation().directionTo(hqLoc);
             if(rc.canDigDirt(dirtohq)){
                 rc.digDirt(dirtohq);
@@ -34,7 +40,7 @@ public class Landscaper extends Unit {
             }
         }
         if (nextToHQ && dirtCarrying > 0 ){
-            if(!surrounded){
+            if(surrounded == 0){
                 MapLocation bestPlaceToBuildWall = null;
                 //find best place to build
                 int lowestElevation = 9999999;

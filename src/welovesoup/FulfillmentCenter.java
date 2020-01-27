@@ -18,7 +18,7 @@ public class FulfillmentCenter extends Building {
         // will only actually happen if we haven't already broadcasted the creation
         //comms.broadcastFulfillmentCenterCreation(rc.getLocation());
         Direction dir = Util.randomDirection();
-        while (numDrone<30) {
+        while (numDrone<3) {
             //for (Direction dir : Util.directions) {
                 while (!tryBuild(RobotType.DELIVERY_DRONE, dir)) {
                     dir = Util.randomDirection();
