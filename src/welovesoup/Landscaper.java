@@ -15,7 +15,6 @@ public class Landscaper extends Unit {
 
     public void takeTurn() throws GameActionException {
         super.takeTurn();
-       // System.out.println(turnCount);
         dirtCarrying = rc.getDirtCarrying();
         nextToHQ = rc.getLocation().isAdjacentTo(hqLoc);
 

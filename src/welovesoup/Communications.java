@@ -58,8 +58,8 @@ public class Communications {
         message[1] = 1;
         message[2] = loc.x; // x coord of HQ
         message[3] = loc.y; // y coord of HQ
-        if (rc.canSubmitTransaction(message, 1)) {
-            rc.submitTransaction(message, 1);
+        if (rc.canSubmitTransaction(message, 3)) {
+            rc.submitTransaction(message, 3);
             broadcastedCreation = true;
         }
     }
@@ -85,8 +85,8 @@ public class Communications {
         message[1] = 2;
         message[2] = loc.x; // x coord of HQ
         message[3] = loc.y; // y coord of HQ
-        if (rc.canSubmitTransaction(message, 2)) {
-            rc.submitTransaction(message, 2);
+        if (rc.canSubmitTransaction(message, 3)) {
+            rc.submitTransaction(message, 3);
             System.out.println("new soup!" + loc);
         }
     }
@@ -124,15 +124,18 @@ public class Communications {
         }
     }
 
+    public boolean filfillmentcreationbroadcastedcreation = false;
     public void broadcastFulfillmentCenterCreation(MapLocation loc) throws GameActionException {
+        if(filfillmentcreationbroadcastedcreation) return; // don't re-broadcast
         int[] message = new int[7];
         message[0] = teamSecret;
         message[1] = 4;
         message[2] = loc.x; // x coord of HQ
         message[3] = loc.y; // y coord of HQ
-        if (rc.canSubmitTransaction(message, 3)) {
-            rc.submitTransaction(message, 3);
+        if (rc.canSubmitTransaction(message, 6)) {
+            rc.submitTransaction(message, 6);
             System.out.println("new fulfillment center!" + loc);
+            filfillmentcreationbroadcastedcreation = true;
         }
     }
 
@@ -155,8 +158,8 @@ public class Communications {
         message[1] = 5;
         message[2] = loc.x; // x coord of HQ
         message[3] = loc.y; // y coord of HQ
-        if (rc.canSubmitTransaction(message, 3)) {
-            rc.submitTransaction(message, 3);
+        if (rc.canSubmitTransaction(message, 5)) {
+            rc.submitTransaction(message, 5);
             System.out.println("new Vaporator!" + loc);
         }
     }
@@ -175,8 +178,8 @@ public class Communications {
         int[] message = new int[7];
         message[0] = teamSecret;
         message[1] = 6;
-        if(rc.canSubmitTransaction(message, 3)){
-            rc.submitTransaction(message, 3);
+        if(rc.canSubmitTransaction(message, 6)){
+            rc.submitTransaction(message, 6);
             System.out.println("Not sorrounded!!");
         }
     }
