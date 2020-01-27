@@ -14,17 +14,14 @@ public class HQ extends Shooter {
         int y = loc.y;
         comms.sendHqLoc(loc);
         comms.broadcastSoupLocation(rc.senseNearbySoup()[0]);
-        placeToDig.add(loc.translate(2, 0 ));
-        placeToDig.add(loc.translate(-2, 0));
-        placeToDig.add(loc.translate(0, 2));
-        placeToDig.add(loc.translate(0, -2));
-        comms.broadcastDigLocations(placeToDig);
+
+//        comms.broadcastDigLocations(placeToDig);
     }
 
     public void takeTurn() throws GameActionException {
         super.takeTurn();
 
-        if(turnCount >= 430 && turnCount <= 432 && !AllLandScapers(rc.senseNearbyRobots(4, team))) {
+        if(turnCount >= 430 && turnCount <= 432 && !AllLandScapers(rc.senseNearbyRobots(4, team)) || turnCount > 500 && turnCount %50 ==0 && !AllLandScapers(rc.senseNearbyRobots(4, team))) {
             comms.broadcastNotSurrounded();
             System.out.println("Not sorrounded");
         }
