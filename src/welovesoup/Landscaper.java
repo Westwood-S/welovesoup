@@ -50,10 +50,12 @@ public class Landscaper extends Unit {
                         }
                     }
                 }
-                if (bestPlaceToBuildWall != null && rc.senseRobotAtLocation(bestPlaceToBuildWall).type != RobotType.LANDSCAPER) {
-                    rc.depositDirt(rc.getLocation().directionTo(bestPlaceToBuildWall));
-                    //rc.setIndicatorDot(bestPlaceToBuildWall, 0, 255, 0);
-                    System.out.println("wall best fit");
+                if (bestPlaceToBuildWall != null) {
+                    if (rc.canDepositDirt(rc.getLocation().directionTo(bestPlaceToBuildWall))){
+                        rc.depositDirt(rc.getLocation().directionTo(bestPlaceToBuildWall));
+                        //rc.setIndicatorDot(bestPlaceToBuildWall, 0, 255, 0);
+                        System.out.println("wall best fit");
+                    }
                 }
 
             } else if(rc.canDepositDirt(Direction.CENTER)) {
