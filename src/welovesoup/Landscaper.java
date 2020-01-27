@@ -21,22 +21,28 @@ public class Landscaper extends Unit {
 
     public void takeTurn() throws GameActionException {
         super.takeTurn();
+
         dirtCarrying = rc.getDirtCarrying();
         nextToHQ = rc.getLocation().isAdjacentTo(hqLoc);
 
         if(rc.getRoundNum() >= 430 && rc.getRoundNum() <= 432 || rc.getRoundNum() > 500 && rc.getRoundNum() % 50 == 1)
             surrounded = comms.updateSurrounded();
 
+        Direction dirtohq = rc.getLocation().directionTo(hqLoc);
         if (hqLoc != null && nextToHQ && dirtCarrying < RobotType.LANDSCAPER.dirtLimit) {
-            Direction dirtohq = rc.getLocation().directionTo(hqLoc);
             if(rc.canDigDirt(dirtohq)){
                 rc.digDirt(dirtohq);
             }
         } else {
-            if (Math.random() < 0.7) {
-                nav.goTo(Util.randomDirection());
+            if (Math.random() < 0.4) {
+                if (!nav.goTo(Util.randomDirection()))
+                    if(rc.canDigDirt(dirtohq))
+                        rc.digDirt(dirtohq);
             } else {
-                nav.goTo(hqLoc);
+                if (!nav.goTo(hqLoc))
+                    if(rc.canDigDirt(dirtohq))
+                        rc.digDirt(dirtohq);
+            
             }
         }
         if (nextToHQ && dirtCarrying > 0 ){
@@ -60,13 +66,13 @@ public class Landscaper extends Unit {
                     if (rc.canDepositDirt(rc.getLocation().directionTo(bestPlaceToBuildWall))){
                         rc.depositDirt(rc.getLocation().directionTo(bestPlaceToBuildWall));
                         //rc.setIndicatorDot(bestPlaceToBuildWall, 0, 255, 0);
-                        System.out.println("wall best fit");
+                        //System.out.println("wall best fit");
                     }
                 }
 
             } else if(rc.canDepositDirt(Direction.CENTER)) {
                 rc.depositDirt(Direction.CENTER);
-                System.out.println("wall under me");
+                //System.out.println("wall under me");
             }
         }else if (dirtCarrying == 0 && rc.getLocation().distanceSquaredTo(hqLoc)<=2){
             tryDig();

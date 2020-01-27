@@ -56,7 +56,7 @@ public class Miner extends Unit {
         if (rc.getRoundNum()> 100 && Soup >= 200 && disToHQ>53 && refineryLocations.size()==0) {
            build(RobotType.REFINERY);   }
 //Design school cost 150
-        if (rc.getRoundNum() > 60 && Soup >= 150 && numDesignSchools == 0 && (disToHQ<=17 && disToHQ>=10 && disToHQ!=13 && disToHQ!=18)) {
+        if (rc.getRoundNum() > 60 && Soup >= 150 && numDesignSchools == 0 && (disToHQ>=10 && disToHQ!=13 && disToHQ!=18 && disToHQ<25)) {
             System.out.println("Trying School"); build(RobotType.DESIGN_SCHOOL); }
 //net gun cost 250
         if(rc.getRoundNum()>300 && Soup >= 1050 && numNetgun < 5 && disToHQ> 8 && disToHQ < 20) {
@@ -67,7 +67,7 @@ public class Miner extends Unit {
 
         // Fulfillment Center cost 150
         numFulfillmentCenters += comms.getNewFulfillmentCenterCount();
-        System.out.println("numfulfillmentcenters: " + numFulfillmentCenters);
+        //System.out.println("numfulfillmentcenters: " + numFulfillmentCenters);
         if(rc.getRoundNum() > 350 && Soup >= 150 && numFulfillmentCenters < 1) {
             System.out.println("Drone facility in progress");
             build(RobotType.FULFILLMENT_CENTER);
@@ -89,6 +89,8 @@ public class Miner extends Unit {
 
        int maxSoup = RobotType.MINER.soupLimit;
 //------------------------------Nav-----------------------------------
+        if (rc.getRoundNum()>280 && rc.getLocation().isAdjacentTo(hqLoc))
+            rc.disintegrate();
         if (rc.getRoundNum()>130) {
             if (rc.getSoupCarrying() == maxSoup){
                 if (refineryLocations.size() == 0) {
@@ -114,7 +116,7 @@ public class Miner extends Unit {
                 nav.goTo(refineryLocations.get(0));
             else {
                 newMove();
-                System.out.println("I moved randomly!");
+                //System.out.println("I moved randomly!");
             }
         } 
         else if (soupLocations.size() > 0) {
@@ -125,7 +127,7 @@ public class Miner extends Unit {
         } 
         else{
             newMove();
-            System.out.println("I moved randomly!");
+            //System.out.println("I moved randomly!");
         }
         //System.out.println("Bytes left: " + Clock.getBytecodesLeft());
     }

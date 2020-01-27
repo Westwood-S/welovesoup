@@ -69,7 +69,7 @@ public class Drone extends Unit {
                     if (rc.canPickUpUnit(r.getID()))
                         rc.pickUpUnit(r.getID());
                 } else {
-                    System.out.println("move square, circle or towards HQ");
+                    //System.out.println("move square, circle or towards HQ");
                     if (opponentHQ != null && rc.getLocation().distanceSquaredTo(opponentHQ) < GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED) {
                         checkRobots(rc.senseNearbyRobots());
                         nav.goTo(hqLoc);
