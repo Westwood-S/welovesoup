@@ -66,14 +66,14 @@ public class Miner extends Unit {
             System.out.println("Trying to build vaporator"); build(RobotType.VAPORATOR); }
 
         // Fulfillment Center cost 150
-        //numFulfillmentCenters += comms.getNewFulfillmentCenterCount();
-//        System.out.println("numfulfillmentcenters: " + numFulfillmentCenters);
-//        if(rc.getRoundNum() > 350 && Soup >= 150 && numFulfillmentCenters < 1) {
-//            System.out.println("Drone facility in progress");
-//            build(RobotType.FULFILLMENT_CENTER);
-//            //while(!tryBuild(RobotType.FULFILLMENT_CENTER, Util.randomDirection())) ;
-//            comms.broadcastFulfillmentCenterCreation(rc.getLocation());
-//        }
+        numFulfillmentCenters += comms.getNewFulfillmentCenterCount();
+        System.out.println("numfulfillmentcenters: " + numFulfillmentCenters);
+        if(rc.getRoundNum() > 350 && Soup >= 150 && numFulfillmentCenters < 1) {
+            System.out.println("Drone facility in progress");
+            build(RobotType.FULFILLMENT_CENTER);
+            //while(!tryBuild(RobotType.FULFILLMENT_CENTER, Util.randomDirection())) ;
+            comms.broadcastFulfillmentCenterCreation(rc.getLocation());
+        }
 
 //----------------------------------Searching for --------------------------------
  //Refinery
