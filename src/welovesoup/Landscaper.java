@@ -7,40 +7,57 @@ import java.util.Map;
 public class Landscaper extends Unit {
     int dirtCarrying = 0;
     boolean nextToHQ = false;
-    public boolean surrounded = true;
+    public int surrounded = -10;
     ArrayList<MapLocation> digLocations= new ArrayList<MapLocation>();
+<<<<<<< HEAD
     MapLocation opponentHQ = null;
+=======
+>>>>>>> 4e3cfb33f7f279d78ff80419a05ace5dfcd1c8c7
 
     public Landscaper(RobotController r) {
         super(r);
+//        digLocations.add(hqLoc.translate(2, 0 ));
+//        digLocations.add(hqLoc.translate(-2, 0));
+//        digLocations.add(hqLoc.translate(0, 2));
+//        digLocations.add(hqLoc.translate(0, -2));
     }
+
 
     public void takeTurn() throws GameActionException {
         super.takeTurn();
+<<<<<<< HEAD
         if (opponentHQ != null) {
             while(!rc.getLocation().isAdjacentTo(opponentHQ))
                 nav.goTo(opponentHQ);
         }
+=======
+
+>>>>>>> 4e3cfb33f7f279d78ff80419a05ace5dfcd1c8c7
         dirtCarrying = rc.getDirtCarrying();
         nextToHQ = rc.getLocation().isAdjacentTo(hqLoc);
 
-        if(rc.getRoundNum() >= 430 && rc.getRoundNum() <= 432)
-            if(comms.updateSurrounded() == 0) surrounded = false;
+        if(rc.getRoundNum() >= 430 && rc.getRoundNum() <= 432 || rc.getRoundNum() > 500 && rc.getRoundNum() % 50 == 1)
+            surrounded = comms.updateSurrounded();
 
-        if (hqLoc != null && nextToHQ) {
-            Direction dirtohq = rc.getLocation().directionTo(hqLoc);
+        Direction dirtohq = rc.getLocation().directionTo(hqLoc);
+        if (hqLoc != null && nextToHQ && dirtCarrying < RobotType.LANDSCAPER.dirtLimit) {
             if(rc.canDigDirt(dirtohq)){
                 rc.digDirt(dirtohq);
             }
         } else {
-            if (Math.random() < 0.7) {
-                nav.goTo(Util.randomDirection());
+            if (Math.random() < 0.4) {
+                if (!nav.goTo(Util.randomDirection()))
+                    if(rc.canDigDirt(dirtohq))
+                        rc.digDirt(dirtohq);
             } else {
-                nav.goTo(hqLoc);
+                if (!nav.goTo(hqLoc))
+                    if(rc.canDigDirt(dirtohq))
+                        rc.digDirt(dirtohq);
+            
             }
         }
         if (nextToHQ && dirtCarrying > 0 ){
-            if(!surrounded){
+            if(surrounded == 0){
                 MapLocation bestPlaceToBuildWall = null;
                 //find best place to build
                 int lowestElevation = 9999999;
@@ -56,15 +73,17 @@ public class Landscaper extends Unit {
                         }
                     }
                 }
-                if (bestPlaceToBuildWall != null && rc.senseRobotAtLocation(bestPlaceToBuildWall).getType() != RobotType.LANDSCAPER) {
-                    rc.depositDirt(rc.getLocation().directionTo(bestPlaceToBuildWall));
-//                    rc.setIndicatorDot(bestPlaceToBuildWall, 0, 255, 0);
-                    System.out.println("wall best fit");
+                if (bestPlaceToBuildWall != null) {
+                    if (rc.canDepositDirt(rc.getLocation().directionTo(bestPlaceToBuildWall))){
+                        rc.depositDirt(rc.getLocation().directionTo(bestPlaceToBuildWall));
+                        //rc.setIndicatorDot(bestPlaceToBuildWall, 0, 255, 0);
+                        //System.out.println("wall best fit");
+                    }
                 }
 
             } else if(rc.canDepositDirt(Direction.CENTER)) {
                 rc.depositDirt(Direction.CENTER);
-                System.out.println("wall under me");
+                //System.out.println("wall under me");
             }
         }else if (dirtCarrying == 0 && rc.getLocation().distanceSquaredTo(hqLoc)<=2){
             tryDig();
