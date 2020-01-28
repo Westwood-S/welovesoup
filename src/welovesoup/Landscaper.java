@@ -9,12 +9,18 @@ public class Landscaper extends Unit {
     boolean nextToHQ = false;
     public boolean surrounded = true;
     ArrayList<MapLocation> digLocations= new ArrayList<MapLocation>();
+    MapLocation opponentHQ = null;
+
     public Landscaper(RobotController r) {
         super(r);
     }
 
     public void takeTurn() throws GameActionException {
         super.takeTurn();
+        if (opponentHQ != null) {
+            while(!rc.getLocation().isAdjacentTo(opponentHQ))
+                nav.goTo(opponentHQ);
+        }
         dirtCarrying = rc.getDirtCarrying();
         nextToHQ = rc.getLocation().isAdjacentTo(hqLoc);
 
