@@ -1,6 +1,5 @@
 dist/*
 build/*
-src/lectureplayer
 
 /matches
 /deploy/lib
@@ -21,6 +20,7 @@ src/lectureplayer
 *.ipr
 *.iws
 /.idea/
+/Battlecode Client.exe/
 
 
 # User-specific stuff:
