@@ -6,6 +6,7 @@ import java.util.Map;
 public class Communications {
     RobotController rc;
 
+    public boolean filfillmentcreationbroadcastedcreation = false;
     // state related only to communications should go here
 
     // all messages from our team should start with this so we can tell them apart
@@ -124,7 +125,7 @@ public class Communications {
         }
     }
 
-    public boolean filfillmentcreationbroadcastedcreation = false;
+
     public void broadcastFulfillmentCenterCreation(MapLocation loc) throws GameActionException {
         if(filfillmentcreationbroadcastedcreation) return; // don't re-broadcast
         int[] message = new int[7];
@@ -138,7 +139,15 @@ public class Communications {
             filfillmentcreationbroadcastedcreation = true;
         }
     }
-
+    public void updateFFCCreation(ArrayList<MapLocation> FFCLoc) throws GameActionException{
+        for(Transaction tx: rc.getBlock(rc.getRoundNum() - 1)){
+            int[] mess = tx.getMessage();
+            if(mess[0] == teamSecret && mess[1] == 4){
+                System.out.println("New FFC!!!!");
+                FFCLoc.add(new MapLocation(mess[2], mess[3]));
+            }
+        }
+    }
     public int getNewFulfillmentCenterCount() throws GameActionException {
         int count = 0;
         for(Transaction tx : rc.getBlock(rc.getRoundNum() - 1)) {
