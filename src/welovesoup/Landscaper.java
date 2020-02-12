@@ -9,6 +9,7 @@ public class Landscaper extends Unit {
     boolean nextToHQ = false;
     public int surrounded = -10;
     ArrayList<MapLocation> digLocations= new ArrayList<MapLocation>();
+    ArrayList<MapLocation> vaporatorLocs = new ArrayList<MapLocation>();
 
     public Landscaper(RobotController r) {
         super(r);
@@ -23,8 +24,9 @@ public class Landscaper extends Unit {
         super.takeTurn();
         dirtCarrying = rc.getDirtCarrying();
         nextToHQ = rc.getLocation().isAdjacentTo(hqLoc);
+        comms.updateVaporatorLocations(vaporatorLocs);
 
-        if(rc.getRoundNum() >= 430 && rc.getRoundNum() <= 432 || rc.getRoundNum() > 500 && rc.getRoundNum() % 50 == 1)
+        if(rc.getRoundNum() >= 301 && rc.getRoundNum() % 50 == 1)
             surrounded = comms.updateSurrounded();
 
         Direction dirtohq = rc.getLocation().directionTo(hqLoc);
