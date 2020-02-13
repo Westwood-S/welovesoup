@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import battlecode.common.*;
-import com.sun.javafx.scene.control.skin.VirtualFlow;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
