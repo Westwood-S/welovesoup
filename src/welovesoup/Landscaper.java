@@ -26,7 +26,7 @@ public class Landscaper extends Unit {
         nextToHQ = rc.getLocation().isAdjacentTo(hqLoc);
         comms.updateVaporatorLocations(vaporatorLocs);
 
-        if(rc.getRoundNum() >= 301 && rc.getRoundNum() % 50 == 1)
+        if(rc.getRoundNum() >= 351 && rc.getRoundNum() % 50 == 1)
             surrounded = comms.updateSurrounded();
 
         Direction dirtohq = rc.getLocation().directionTo(hqLoc);
@@ -35,7 +35,7 @@ public class Landscaper extends Unit {
                 rc.digDirt(dirtohq);
             }
         } else {
-            if (Math.random() < 0.4) {
+            if (Math.random()  < 0.4) {
                 if (!nav.goTo(Util.randomDirection()))
                     if(rc.canDigDirt(dirtohq))
                         rc.digDirt(dirtohq);

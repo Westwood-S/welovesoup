@@ -20,7 +20,7 @@ public class HQ extends Shooter {
     public void takeTurn() throws GameActionException {
         super.takeTurn();
 
-        if(turnCount >= 300 && turnCount % 50 == 0 &&!AllLandScapers(rc.senseNearbyRobots(4, team))) {
+        if(turnCount >= 350 && turnCount % 50 == 0 &&!AllLandScapers(rc.senseNearbyRobots(4, team))) {
             comms.broadcastNotSurrounded();
             System.out.println("Not sorrounded");
         }
