@@ -77,7 +77,7 @@ public class Miner extends Unit {
 
 // Fulfillment Center cost 150
             //System.out.println("numfulfillmentcenters: " + numFulfillmentCenters);
-            if (rc.getRoundNum() > 350 && FFLocs.size() == 0) {
+            if (rc.getRoundNum() > 350 && FFLocs.size() == 0 && Math.random() * 1 < .25) {
                 build(RobotType.FULFILLMENT_CENTER);
             }
         }else{
