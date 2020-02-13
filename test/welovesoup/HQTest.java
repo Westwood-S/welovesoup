@@ -9,12 +9,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.ArrayList;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HQTest {
@@ -54,7 +53,6 @@ public class HQTest {
 
 	@Test
 	public void testTakeTurnCreateOneMiner() throws GameActionException {
-//		HQ hq = Mockito.mock(HQ.class);
 		doAnswer((i)->{
 			hq.numMiners++;
 			return hq.numMiners;
@@ -66,7 +64,6 @@ public class HQTest {
 
 	@Test
 	public void testTakeTurnCreateTwoMiners() throws GameActionException {
-		//HQ hq = Mockito.mock(HQ.class);
 		hq.numMiners = 0;
 		assertEquals(hq.numMiners, 0);
 		doAnswer((i)->{
@@ -82,7 +79,6 @@ public class HQTest {
 
 	@Test
 	public void testTakeTurnCreateMoreThanSevenMiners() throws GameActionException {
-		//HQ hq = Mockito.mock(HQ.class);
 		hq.numMiners = 0;
 		assertEquals(hq.numMiners, 0);
 		doAnswer((i)->{
