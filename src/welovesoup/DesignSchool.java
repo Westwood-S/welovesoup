@@ -21,7 +21,7 @@ public class DesignSchool extends Building {
                     System.out.println("made a landscaper");
                     numLandScapers++;
                 }
-        }else if (rc.getTeamSoup() > 1000){
+        } else if (rc.getTeamSoup() > 1000){
             for (Direction dir : Util.directions)
                 if (tryBuild(RobotType.LANDSCAPER, dir)) {
                     System.out.println("made a landscaper");
