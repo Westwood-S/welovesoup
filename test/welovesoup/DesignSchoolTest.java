@@ -38,11 +38,13 @@ public class DesignSchoolTest {
                 ds.numLandScapers += 1;
             return ds.numLandScapers;
         }).when(ds).takeTurn();
+        // do increment the numLandScapers
         when(ds.rc.getRoundNum()).thenReturn(500);
         int i = ds.numLandScapers;
         ds.takeTurn();
         verify(ds,times(1)).takeTurn();
         assertEquals(i+1, ds.numLandScapers);
+        // don't increment numLandScapers
         when(ds.rc.getRoundNum()).thenReturn(550);
         ds.takeTurn();
         verify(ds,times(2)).takeTurn();
