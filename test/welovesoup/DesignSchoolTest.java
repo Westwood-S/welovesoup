@@ -51,7 +51,7 @@ public class DesignSchoolTest {
         assertEquals(i+1, ds.numLandScapers);
     }
     
-        @Test
+    @Test
     public void testTakeTurn_tryBuild_directions() throws GameActionException {
         DesignSchool ds = Mockito.mock(DesignSchool.class);
         ds.rc = Mockito.mock(RobotController.class);
