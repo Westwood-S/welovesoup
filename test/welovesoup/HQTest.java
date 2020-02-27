@@ -91,4 +91,83 @@ public class HQTest {
 		verify(hq,times(8)).takeTurn();
 		assertEquals( 7, hq.numMiners);
 	}
+
+	@Test
+	public void testAllLandScapers_RobotInfo() throws GameActionException {
+		hq.numMiners = 0;
+		assertEquals(hq.numMiners, 0);
+		RobotInfo[] robotInfo = new RobotInfo[1];
+		robotInfo[0] = new RobotInfo(1,hq.team, RobotType.MINER, 3, false, 1, 3, 10, new MapLocation(1,1));
+		doAnswer((i)->{
+			if(robotInfo.length < 7)
+				return false;
+			return true;
+		}).when(hq).AllLandScapers(robotInfo);
+		hq.AllLandScapers(robotInfo);
+		verify(hq,times(1)).AllLandScapers(robotInfo);
+		assertEquals( 0, hq.numMiners);
+		assertEquals( false, hq.AllLandScapers(robotInfo));
+	}
+
+	@Test
+	public void testAllLandScapers_8RobotInfo() throws GameActionException {
+		hq.numMiners = 0;
+		assertEquals(hq.numMiners, 0);
+		RobotInfo[] robotInfo = new RobotInfo[8];
+		robotInfo[0] = new RobotInfo(1,hq.team, RobotType.MINER, 3, false, 1, 3, 10, new MapLocation(1,1));
+		robotInfo[1] = new RobotInfo(2,hq.team, RobotType.LANDSCAPER, 3, false, 1, 3, 10, new MapLocation(1,1));
+		doAnswer((i)->{
+			if(robotInfo.length < 7)
+				return false;
+			return true;
+		}).when(hq).AllLandScapers(robotInfo);
+		hq.AllLandScapers(robotInfo);
+		verify(hq,times(1)).AllLandScapers(robotInfo);
+		assertEquals( 0, hq.numMiners);
+		assertEquals( true, hq.AllLandScapers(robotInfo));
+	}
+
+	@Test
+	public void testAllLandScapers_landscaper() throws GameActionException {
+		hq.numMiners = 0;
+		assertEquals(hq.numMiners, 0);
+		RobotInfo[] robotInfo = new RobotInfo[8];
+		robotInfo[0] = new RobotInfo(1,hq.team, RobotType.MINER, 3, false, 1, 3, 10, new MapLocation(1,1));
+		robotInfo[1] = new RobotInfo(2,hq.team, RobotType.LANDSCAPER, 3, false, 1, 3, 10, new MapLocation(1,1));
+		doAnswer((i)->{
+			hq.numMiners = 9;
+			if(robotInfo.length < 7)
+				return false;
+			if(robotInfo[1].type == RobotType.LANDSCAPER)
+				return true;
+			return true;
+		}).when(hq).AllLandScapers(robotInfo);
+		hq.AllLandScapers(robotInfo);
+		verify(hq,times(1)).AllLandScapers(robotInfo);
+		assertEquals( 9, hq.numMiners);
+		assertEquals( true, hq.AllLandScapers(robotInfo));
+	}
+
+	@Test
+	public void testAllLandScapers_team() throws GameActionException {
+		hq.numMiners = 0;
+		assertEquals(hq.numMiners, 0);
+		RobotInfo[] robotInfo = new RobotInfo[8];
+		robotInfo[0] = new RobotInfo(1,hq.team, RobotType.MINER, 3, false, 1, 3, 10, new MapLocation(1,1));
+		robotInfo[1] = new RobotInfo(2,hq.team, RobotType.LANDSCAPER, 3, false, 1, 3, 10, new MapLocation(1,1));
+		doAnswer((i)->{
+			hq.numMiners = 9;
+			if(robotInfo.length < 7)
+				return false;
+			if(robotInfo[1].type == RobotType.LANDSCAPER)
+				return true;
+			if(robotInfo[1].team != hq.team)
+				return false;
+			return true;
+		}).when(hq).AllLandScapers(robotInfo);
+		hq.AllLandScapers(robotInfo);
+		verify(hq,times(1)).AllLandScapers(robotInfo);
+		assertEquals( 9, hq.numMiners);
+		assertEquals( true, hq.AllLandScapers(robotInfo));
+	}
 }
