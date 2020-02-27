@@ -30,7 +30,7 @@ public class Landscaper extends Unit {
             surrounded = comms.updateSurrounded();
 
         Direction dirtohq = rc.getLocation().directionTo(hqLoc);
-        if (hqLoc != null && nextToHQ && dirtCarrying < RobotType.LANDSCAPER.dirtLimit) {
+        if (hqLoc != null && nextToHQ && dirtCarrying < RobotType.LANDSCAPER.dirtLimit && rc.getRoundNum()>150) {
             if(rc.canDigDirt(dirtohq)){
                 rc.digDirt(dirtohq);
             }
@@ -75,7 +75,7 @@ public class Landscaper extends Unit {
                 rc.depositDirt(Direction.CENTER);
                 //System.out.println("wall under me");
             }
-        }else if (dirtCarrying == 0 && rc.getLocation().distanceSquaredTo(hqLoc)<=2){
+        }else if (dirtCarrying == 0 && rc.getLocation().distanceSquaredTo(hqLoc)<=2 && rc.getRoundNum()>150){
             tryDig();
         }
     }
