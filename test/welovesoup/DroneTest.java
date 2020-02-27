@@ -140,4 +140,21 @@ public class DroneTest {
         verify(d.rc, times(1)).dropUnit(Direction.CENTER);
         verify(d.rc, times(2)).isCurrentlyHoldingUnit();
     }
+
+    @Test
+    public void testSearchForOpponentHQ() throws GameActionException {
+        Drone d = Mockito.mock(Drone.class);
+        RobotInfo[] robotInfos = new RobotInfo[1];
+        d.rc = Mockito.mock(RobotController.class);
+        robotInfos[0] = new RobotInfo(1,d.rc.getTeam(),RobotType.MINER,1, true, 1, 1, 10, new MapLocation(1,1));
+        doAnswer((i)->{
+            d.rc.senseNearbyRobots();
+            d.opponentHQ = new MapLocation(1,1);
+            return true;
+        }).when(d).searchForOpponentHQ();
+        d.searchForOpponentHQ();
+        verify(d, times(1)).searchForOpponentHQ();
+        verify(d.rc, times(1)).senseNearbyRobots();
+        assertNotEquals(d.opponentHQ, null);
+    }
 }
