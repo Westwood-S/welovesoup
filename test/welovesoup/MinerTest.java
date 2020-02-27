@@ -203,4 +203,31 @@ public class MinerTest {
         assertEquals(new MapLocation(1,2).toString(), m.hqLoc.toString());
         assertEquals(0, m.soupLocations.size());
     }
+
+    @Test
+    public void testTryMine() throws GameActionException {
+        Miner m = Mockito.mock(Miner.class);
+        m.rc = Mockito.mock(RobotController.class);
+        m.nav = Mockito.mock(Navigation.class);
+        m.soupLocations = new ArrayList<>(1);
+        m.soupLocations.add(new MapLocation(1,1));
+        doAnswer((i)->{
+            m.soupLocations.remove(0);
+            m.hqLoc = new MapLocation(1,2);
+            m.rc.depositDirt(Direction.CENTER);
+            m.nav.goTo(m.hqLoc);
+            m.nav.goTo(new MapLocation(2,2));
+            m.rc.depositSoup(Direction.CENTER, 1);
+            m.rc.mineSoup(Direction.CENTER);
+            return true;
+        }).when(m).tryMine(Direction.CENTER);
+        m.tryMine(Direction.CENTER);
+        verify(m.rc, times(1)).depositDirt(Direction.CENTER);
+        verify(m.rc, times(1)).depositSoup(Direction.CENTER, 1);
+        verify(m.rc, times(1)).mineSoup(Direction.CENTER);
+        verify(m.nav, times(1)).goTo(new MapLocation(2,2));
+        verify(m, times(1)).tryMine(Direction.CENTER);
+        assertEquals(new MapLocation(1,2).toString(), m.hqLoc.toString());
+        assertEquals(0, m.soupLocations.size());
+    }
 }
