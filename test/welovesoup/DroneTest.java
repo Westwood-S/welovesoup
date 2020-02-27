@@ -147,14 +147,34 @@ public class DroneTest {
         RobotInfo[] robotInfos = new RobotInfo[1];
         d.rc = Mockito.mock(RobotController.class);
         robotInfos[0] = new RobotInfo(1,d.rc.getTeam(),RobotType.MINER,1, true, 1, 1, 10, new MapLocation(1,1));
+        d.robotInfos = robotInfos;
         doAnswer((i)->{
             d.rc.senseNearbyRobots();
-            d.opponentHQ = new MapLocation(1,1);
+            if(d.robotInfos.length > 0)
+                d.opponentHQ = new MapLocation(1,1);
             return true;
         }).when(d).searchForOpponentHQ();
         d.searchForOpponentHQ();
         verify(d, times(1)).searchForOpponentHQ();
         verify(d.rc, times(1)).senseNearbyRobots();
         assertNotEquals(d.opponentHQ, null);
+    }
+
+    @Test
+    public void testSearchForOpponentHQ_null_opponentHQ() throws GameActionException {
+        Drone d = Mockito.mock(Drone.class);
+        d.rc = Mockito.mock(RobotController.class);
+        d.rc.dropUnit(Util.randomDirection());
+        d.robotInfos = new RobotInfo[0];
+        doAnswer((i)->{
+            d.rc.senseNearbyRobots();
+            if(d.robotInfos.length > 0)
+                d.opponentHQ = new MapLocation(1,1);
+            return true;
+        }).when(d).searchForOpponentHQ();
+        d.searchForOpponentHQ();
+        verify(d, times(1)).searchForOpponentHQ();
+        verify(d.rc, times(1)).senseNearbyRobots();
+        assertEquals(null, d.opponentHQ);
     }
 }
