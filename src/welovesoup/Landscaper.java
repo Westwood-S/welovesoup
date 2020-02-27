@@ -87,15 +87,14 @@ public class Landscaper extends Unit {
         } else {
             dir = hqLoc.directionTo(rc.getLocation());
         }
-        for(Direction dire : Util.directions) {
-            if(dire != Direction.CENTER && !rc.getLocation().add(dire).isAdjacentTo(hqLoc)) {
-                if (rc.canDigDirt(dire) && !rc.isLocationOccupied(rc.adjacentLocation(dire))) {
-                    rc.digDirt(dire);
-                    rc.setIndicatorDot(rc.getLocation().add(dire), 255, 0, 0);
+        /* for(Direction dire : Util.directions) {
+            if(dire != Direction.CENTER && !rc.getLocation().add(dire).isAdjacentTo(hqLoc)) { */
+                if (rc.canDigDirt(dir) && !rc.isLocationOccupied(rc.adjacentLocation(dir))) {
+                    rc.digDirt(dir);
                     return true;
                 }
-            }
-        }
+       /*      }
+        } */
         return false;
     }
 }
