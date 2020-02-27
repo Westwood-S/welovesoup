@@ -125,11 +125,6 @@ public class Communications {
         }
     }
 
-<<<<<<< HEAD
-    public boolean filfillmentcreationbroadcastedcreation = false;
-=======
-
->>>>>>> master
     public void broadcastFulfillmentCenterCreation(MapLocation loc) throws GameActionException {
         if(filfillmentcreationbroadcastedcreation) return; // don't re-broadcast
         int[] message = new int[7];
@@ -143,6 +138,7 @@ public class Communications {
             filfillmentcreationbroadcastedcreation = true;
         }
     }
+
     public void updateFFCCreation(ArrayList<MapLocation> FFCLoc) throws GameActionException{
         for(Transaction tx: rc.getBlock(rc.getRoundNum() - 1)){
             int[] mess = tx.getMessage();
@@ -152,18 +148,6 @@ public class Communications {
             }
         }
     }
-    public int getNewFulfillmentCenterCount() throws GameActionException {
-        int count = 0;
-        for(Transaction tx : rc.getBlock(rc.getRoundNum() - 1)) {
-            int[] mess = tx.getMessage();
-            if(mess[0] == teamSecret && mess[1] == 4) {
-                System.out.println("heard about a cool new fulfillment center");
-                count += 1;
-            }
-        }
-        return count;
-    }
-
 
     public int getNewFulfillmentCenterCount() throws GameActionException {
         int count = 0;
@@ -176,7 +160,6 @@ public class Communications {
         }
         return count;
     }
-
 
     public void broadcastVaporatorLocation(MapLocation loc) throws GameActionException {
         int[] message = new int[7];
@@ -243,8 +226,6 @@ public class Communications {
         }
         return 0;
     }
-<<<<<<< HEAD
-=======
 
     public boolean broadcastDigLocations(ArrayList<MapLocation> locations) throws GameActionException {
         if(locations.size() == 0) return false;
@@ -282,6 +263,5 @@ public class Communications {
         }
         return false;
     }
->>>>>>> master
 }
 

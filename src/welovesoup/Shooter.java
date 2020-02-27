@@ -10,11 +10,8 @@ public class Shooter extends Building {
     public void takeTurn() throws GameActionException {
         super.takeTurn();
 
-<<<<<<< HEAD
-        RobotInfo[] robots = rc.senseNearbyRobots(5,rc.getTeam().opponent());
-=======
         RobotInfo[] robots = rc.senseNearbyRobots(rc.getCurrentSensorRadiusSquared(),rc.getTeam().opponent());
->>>>>>> master
+
         for (RobotInfo robot : robots) {
             if (robot.type == RobotType.LANDSCAPER || robot.type == RobotType.DESIGN_SCHOOL || robot.type == RobotType.MINER || robot.type == RobotType.DELIVERY_DRONE) {
                 if (rc.canShootUnit(robot.ID)) {
