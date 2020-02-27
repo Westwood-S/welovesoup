@@ -6,6 +6,7 @@ import java.util.Map;
 public class Communications {
     RobotController rc;
 
+    public boolean filfillmentcreationbroadcastedcreation = false;
     // state related only to communications should go here
 
     // all messages from our team should start with this so we can tell them apart
@@ -124,7 +125,11 @@ public class Communications {
         }
     }
 
+<<<<<<< HEAD
     public boolean filfillmentcreationbroadcastedcreation = false;
+=======
+
+>>>>>>> master
     public void broadcastFulfillmentCenterCreation(MapLocation loc) throws GameActionException {
         if(filfillmentcreationbroadcastedcreation) return; // don't re-broadcast
         int[] message = new int[7];
@@ -138,6 +143,27 @@ public class Communications {
             filfillmentcreationbroadcastedcreation = true;
         }
     }
+    public void updateFFCCreation(ArrayList<MapLocation> FFCLoc) throws GameActionException{
+        for(Transaction tx: rc.getBlock(rc.getRoundNum() - 1)){
+            int[] mess = tx.getMessage();
+            if(mess[0] == teamSecret && mess[1] == 4){
+                System.out.println("New FFC!!!!");
+                FFCLoc.add(new MapLocation(mess[2], mess[3]));
+            }
+        }
+    }
+    public int getNewFulfillmentCenterCount() throws GameActionException {
+        int count = 0;
+        for(Transaction tx : rc.getBlock(rc.getRoundNum() - 1)) {
+            int[] mess = tx.getMessage();
+            if(mess[0] == teamSecret && mess[1] == 4) {
+                System.out.println("heard about a cool new fulfillment center");
+                count += 1;
+            }
+        }
+        return count;
+    }
+
 
     public int getNewFulfillmentCenterCount() throws GameActionException {
         int count = 0;
@@ -217,5 +243,45 @@ public class Communications {
         }
         return 0;
     }
+<<<<<<< HEAD
+=======
+
+    public boolean broadcastDigLocations(ArrayList<MapLocation> locations) throws GameActionException {
+        if(locations.size() == 0) return false;
+        int[] message = new int[7];
+        int shift = 0;
+        message[0] = teamSecret;
+        int i = 0;
+        for(MapLocation Loc : locations){
+            shift = Loc.x;
+            shift = shift << 6;
+            shift += Loc.y;
+            message[i+1] = shift;
+            i++;
+        }
+
+        if(rc.canSubmitTransaction(message, 3)) {
+            rc.submitTransaction(message, 3);
+            System.out.println("Dig locations");
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public boolean getDigLocations(ArrayList<MapLocation> locations) throws GameActionException {
+        for (Transaction tx : rc.getBlock(rc.getRoundNum() - 1)) {
+            int[] mess = tx.getMessage();
+            if(mess == null) return false;
+            if (mess[0] == teamSecret) {
+               if(mess[1] > 10){
+                   
+
+               }
+            }
+        }
+        return false;
+    }
+>>>>>>> master
 }
 

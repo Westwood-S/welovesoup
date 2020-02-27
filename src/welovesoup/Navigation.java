@@ -19,7 +19,19 @@ public class Navigation {
      */
     boolean tryMove(Direction dir) throws GameActionException {
         if (rc.isReady() && rc.canMove(dir)) {
+<<<<<<< HEAD
             if (rc.getType()!=RobotType.DELIVERY_DRONE && (rc.senseFlooding(rc.getLocation().add(dir)) ||  rc.sensePollution(rc.getLocation().add(dir))>2000 )){
+=======
+            if (rc.getType()==RobotType.LANDSCAPER){
+                if (rc.senseFlooding(rc.getLocation().add(dir)) )
+                    return false;
+                else {
+                    rc.move(dir);
+                    return true;
+                }
+            }
+            else if (rc.getType()!=RobotType.DELIVERY_DRONE && (rc.senseFlooding(rc.getLocation().add(dir)) ||  rc.sensePollution(rc.getLocation().add(dir))>2000 )){
+>>>>>>> master
                 return false;
             }
             else {
