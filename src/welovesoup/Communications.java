@@ -5,6 +5,7 @@ import java.util.Map;
 
 public class Communications {
     RobotController rc;
+    public boolean filfillmentcreationbroadcastedcreation = false;
 
     // state related only to communications should go here
 
@@ -19,6 +20,7 @@ public class Communications {
         "fullfillment center created",                      // 4
         "vaporator created",                                // 5
         "Not sorrounded",                                   // 6
+        "Has enemy"                                         // 7 
     };
 
     public Communications(RobotController r) {
@@ -31,8 +33,8 @@ public class Communications {
         message[1] = 0;
         message[2] = loc.x; // x coord of HQ
         message[3] = loc.y; // y coord of HQ
-        if (rc.canSubmitTransaction(message, 3))
-            rc.submitTransaction(message, 3);
+        if (rc.canSubmitTransaction(message, 1))
+            rc.submitTransaction(message, 1);
     }
 
     public MapLocation getHqLocFromBlockchain() throws GameActionException {
@@ -124,14 +126,26 @@ public class Communications {
     }
 
     public void broadcastFulfillmentCenterCreation(MapLocation loc) throws GameActionException {
+        if(filfillmentcreationbroadcastedcreation) return; // don't re-broadcast
         int[] message = new int[7];
         message[0] = teamSecret;
         message[1] = 4;
         message[2] = loc.x; // x coord of HQ
         message[3] = loc.y; // y coord of HQ
-        if (rc.canSubmitTransaction(message, 3)) {
-            rc.submitTransaction(message, 3);
+        if (rc.canSubmitTransaction(message, 6)) {
+            rc.submitTransaction(message, 6);
             System.out.println("new fulfillment center!" + loc);
+            filfillmentcreationbroadcastedcreation = true;
+        }
+    }
+
+    public void updateFFCCreation(ArrayList<MapLocation> FFCLoc) throws GameActionException{
+        for(Transaction tx: rc.getBlock(rc.getRoundNum() - 1)){
+            int[] mess = tx.getMessage();
+            if(mess[0] == teamSecret && mess[1] == 4){
+                System.out.println("New FFC!!!!");
+                FFCLoc.add(new MapLocation(mess[2], mess[3]));
+            }
         }
     }
 
@@ -147,15 +161,14 @@ public class Communications {
         return count;
     }
 
-
     public void broadcastVaporatorLocation(MapLocation loc) throws GameActionException {
         int[] message = new int[7];
         message[0] = teamSecret;
         message[1] = 5;
         message[2] = loc.x; // x coord of HQ
         message[3] = loc.y; // y coord of HQ
-        if (rc.canSubmitTransaction(message, 3)) {
-            rc.submitTransaction(message, 3);
+        if (rc.canSubmitTransaction(message, 5)) {
+            rc.submitTransaction(message, 5);
             System.out.println("new Vaporator!" + loc);
         }
     }
@@ -174,21 +187,81 @@ public class Communications {
         int[] message = new int[7];
         message[0] = teamSecret;
         message[1] = 6;
-        if(rc.canSubmitTransaction(message, 3)){
-            rc.submitTransaction(message, 3);
+        if(rc.canSubmitTransaction(message, 6)){
+            rc.submitTransaction(message, 6);
             System.out.println("Not sorrounded!!");
         }
     }
 
-    public boolean updateSurrounded() throws GameActionException {
+    public int updateSurrounded() throws GameActionException {
         for (Transaction tx : rc.getBlock(rc.getRoundNum() - 1)) {
             int[] mess = tx.getMessage();
+            if(mess == null) return -1;
             if (mess[0] == teamSecret && mess[1] == 6) {
                 System.out.println("NOT SORROUNDED");
-                return false;
+                return 0;
             }
         }
-        return true;
+        return 1;
+    }
+
+    public void broadcastHasEnemy() throws GameActionException{
+        int[] message = new int[7];
+        message[0] = teamSecret;
+        message[1] = 7;
+        if(rc.canSubmitTransaction(message, 3)){
+            rc.submitTransaction(message, 3);
+            System.out.println("HELP OMG!!!");
+        }
+    }
+
+    public int updateHasEnemy() throws GameActionException {
+        for (Transaction tx : rc.getBlock(rc.getRoundNum() - 1)) {
+            int[] mess = tx.getMessage();
+            if (mess == null) return -1;
+            if (mess[0] == teamSecret && mess[1] == 7) {
+                System.out.println("WHY EVERYBODY RUSH");
+                return 1;
+            }
+        }
+        return 0;
+    }
+
+    public boolean broadcastDigLocations(ArrayList<MapLocation> locations) throws GameActionException {
+        if(locations.size() == 0) return false;
+        int[] message = new int[7];
+        int shift = 0;
+        message[0] = teamSecret;
+        int i = 0;
+        for(MapLocation Loc : locations){
+            shift = Loc.x;
+            shift = shift << 6;
+            shift += Loc.y;
+            message[i+1] = shift;
+            i++;
+        }
+
+        if(rc.canSubmitTransaction(message, 3)) {
+            rc.submitTransaction(message, 3);
+            System.out.println("Dig locations");
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public boolean getDigLocations(ArrayList<MapLocation> locations) throws GameActionException {
+        for (Transaction tx : rc.getBlock(rc.getRoundNum() - 1)) {
+            int[] mess = tx.getMessage();
+            if(mess == null) return false;
+            if (mess[0] == teamSecret) {
+               if(mess[1] > 10){
+                   
+
+               }
+            }
+        }
+        return false;
     }
 }
 

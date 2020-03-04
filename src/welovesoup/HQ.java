@@ -1,28 +1,43 @@
 package welovesoup;
 import battlecode.common.*;
 
+import java.util.ArrayList;
+
 public class HQ extends Shooter {
     static int numMiners = 0;
-    Team team = rc.getTeam();
-    MapLocation[] available =  new MapLocation[8];
+
+    Team team;
+    ArrayList<MapLocation> placeToDig = new ArrayList<MapLocation>();
+
     public HQ(RobotController r) throws GameActionException {
         super(r);
-
-        comms.sendHqLoc(rc.getLocation());
+        MapLocation loc = rc.getLocation();
+         this.team = rc.getTeam();
+        comms.sendHqLoc(loc);
         comms.broadcastSoupLocation(rc.senseNearbySoup()[0]);
+
+//        comms.broadcastDigLocations(placeToDig);
+
     }
 
     public void takeTurn() throws GameActionException {
         super.takeTurn();
-        //System.out.println("Soup Locations:" + rc.senseNearbySoup());
-        if(turnCount >= 200 && turnCount <= 202 && !AllLandScapers(rc.senseNearbyRobots(4, team))) {
+        if(turnCount >= 350 && turnCount % 50 == 0 &&!AllLandScapers(rc.senseNearbyRobots(4, team))) {
             comms.broadcastNotSurrounded();
             System.out.println("Not sorrounded");
         }
-        if(numMiners < 4) {
-            //for (Direction dir : Util.directions)
-            if (tryBuild(RobotType.MINER, Util.randomDirection())) {
-                numMiners++;
+        if(rc.getMapHeight() < 64){
+            if(numMiners < 4) {
+                //for (Direction dir : Util.directions)
+                if (tryBuild(RobotType.MINER, Util.randomDirection())) {
+                    numMiners++;
+                }
+            }
+        } else {
+            if(numMiners < 7) {
+                if (tryBuild(RobotType.MINER, Util.randomDirection())){
+                    numMiners++;
+                }
             }
         }
     }
