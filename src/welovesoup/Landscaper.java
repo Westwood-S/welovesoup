@@ -13,10 +13,6 @@ public class Landscaper extends Unit {
 
     public Landscaper(RobotController r) {
         super(r);
-//        digLocations.add(hqLoc.translate(2, 0 ));
-//        digLocations.add(hqLoc.translate(-2, 0));
-//        digLocations.add(hqLoc.translate(0, 2));
-//        digLocations.add(hqLoc.translate(0, -2));
     }
 
 
@@ -25,7 +21,16 @@ public class Landscaper extends Unit {
         dirtCarrying = rc.getDirtCarrying();
         nextToHQ = rc.getLocation().isAdjacentTo(hqLoc);
         comms.updateVaporatorLocations(vaporatorLocs);
+        if(rc.getRoundNum() >= 500) {
+            for (RobotInfo r:rc.senseNearbyRobots()) {
+                if(r.type == RobotType.NET_GUN){
+                    nav.goTo(r.location);
+                }
+            }
+        }
 
+        if(rc.getRoundNum() >= 351 && rc.getRoundNum() % 50 == 1)
+            surrounded = comms.updateSurrounded();
         Direction dirtohq = rc.getLocation().directionTo(hqLoc);
 
         if (hqLoc != null && nextToHQ && dirtCarrying < RobotType.LANDSCAPER.dirtLimit) {
@@ -38,7 +43,6 @@ public class Landscaper extends Unit {
             }
                 if (nextToHQ && dirtCarrying > 0) {
                     if (surrounded == 0) {
-
                         MapLocation bestPlaceToBuildWall = null;
                         //find best place to build
                         int lowestElevation = 9999999;

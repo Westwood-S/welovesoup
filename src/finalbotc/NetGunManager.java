@@ -1,31 +1,30 @@
-package welovesoup;
+package finalbotc;
 
-import battlecode.common.*;
-import finalbotc.NetGunManager;
 
-public class netGun extends Shooter {
+import battlecode.common.GameConstants;
+import battlecode.common.MapLocation;
+import battlecode.common.RobotController;
+import battlecode.common.RobotInfo;
+
+public class NetGunManager {
+
+    RobotController rc;
     MapLocation myLoc;
 
-    public netGun(RobotController r) {
-        super(r);
+    NetGunManager(RobotController rc){
+        this.rc = rc;
         myLoc = rc.getLocation();
-    }
-
-    @Override
-    public void takeTurn() throws GameActionException {
-        super.takeTurn();
-        tryShoot();
     }
 
     void tryShoot(){
         if (!rc.isReady()) return;
-        netGun.ShootingTarget s = null;
+        ShootingTarget s = null;
         int sight = rc.getCurrentSensorRadiusSquared();
         if (sight > GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED) sight = GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED;
         RobotInfo[] rArray = rc.senseNearbyRobots(sight, rc.getTeam().opponent());
         for (RobotInfo r : rArray){
             if (rc.canShootUnit(r.getID())){
-                netGun.ShootingTarget t = new netGun.ShootingTarget(r);
+                ShootingTarget t = new ShootingTarget(r);
                 if (t.isBetterThan(s)) s = t;
             }
         }
@@ -41,7 +40,7 @@ public class netGun extends Shooter {
             id = r.getID();
         }
 
-        boolean isBetterThan(netGun.ShootingTarget s){
+        boolean isBetterThan(ShootingTarget s){
             if (s == null) return true;
             return dist < s.dist;
         }

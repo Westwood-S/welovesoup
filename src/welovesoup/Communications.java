@@ -126,14 +126,14 @@ public class Communications {
     }
 
     public void broadcastFulfillmentCenterCreation(MapLocation loc) throws GameActionException {
-        if(filfillmentcreationbroadcastedcreation) return; // don't re-broadcast
+        //if(filfillmentcreationbroadcastedcreation) return; // don't re-broadcast
         int[] message = new int[7];
         message[0] = teamSecret;
         message[1] = 4;
         message[2] = loc.x; // x coord of HQ
         message[3] = loc.y; // y coord of HQ
-        if (rc.canSubmitTransaction(message, 6)) {
-            rc.submitTransaction(message, 6);
+        if (rc.canSubmitTransaction(message, 3)) {
+            rc.submitTransaction(message, 3);
             System.out.println("new fulfillment center!" + loc);
             filfillmentcreationbroadcastedcreation = true;
         }
@@ -262,6 +262,27 @@ public class Communications {
             }
         }
         return false;
+    }
+
+    int getBidValue(){
+        try {
+            int r = rc.getRoundNum();
+            if (r <= 1) return 1;
+            Transaction[] transactions = rc.getBlock(r-1);
+            int ans = 1;
+            if (transactions.length < GameConstants.NUMBER_OF_TRANSACTIONS_PER_BLOCK) return 1;
+            for (Transaction t : transactions){
+                if (t == null) return 1;
+                if ((t.getMessage()[6]) != r-1){
+                    int b = t.getCost();
+                    if (b >= ans) ans = b+1;
+                }
+            }
+            return ans;
+        } catch (Throwable t){
+            t.printStackTrace();
+        }
+        return 1;
     }
 }
 

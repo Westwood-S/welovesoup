@@ -27,7 +27,7 @@ public class Miner extends Unit {
 
     public void takeTurn() throws GameActionException {
         super.takeTurn();
-        
+        System.out.println("bid: " + comms.getBidValue());
         numDesignSchools += comms.getNewDesignSchoolCount();
 //        numNetgun += comms.getGunCount();
         //numFulfillmentCenters += comms.getNewFulfillmentCenterCount();
@@ -55,6 +55,13 @@ public class Miner extends Unit {
                 if(nav.tryMove(dir))
                     stuck = false;
         }
+//        if (Soup >= 250 && numNetgun < 2) {
+//            System.out.println("Trying gun");
+//            build(RobotType.NET_GUN);
+//            ++numNetgun;
+//        }
+//        if(rc.getTeamSoup() >= 500)
+//            build(RobotType.VAPORATOR);
 ////---------------------------------------Trying to build------------------------------------
         if(rc.getRoundNum() < 500 && Soup > 150) {
 //Vaporator cost 500
@@ -75,13 +82,18 @@ public class Miner extends Unit {
 //net gun cost 250
 //        if(rc.getRoundNum()>300 && Soup >= 1050 && numNetgun < 5 && disToHQ> 8 && disToHQ < 20) {
 //            System.out.println("Trying gun"); build(RobotType.NET_GUN); ++numNetgun; }
-
+        if(Soup >= 250 && numNetgun < 1) {
+            System.out.println("Trying gun");
+            //build(RobotType.NET_GUN); ++numNetgun;
+            tryBuild(RobotType.NET_GUN, hqLoc.directionTo(hqLoc.translate(30,30)));
+            ++numNetgun;
+        }
 
 // Fulfillment Center cost 150
             //System.out.println("numfulfillmentcenters: " + numFulfillmentCenters);
-            if (rc.getRoundNum() > 350 && FFLocs.size() == 0 && Math.random() * 1 < .25) {
-                build(RobotType.FULFILLMENT_CENTER);
-            }
+//            if (rc.getRoundNum() > 350 && FFLocs.size() == 0 && (1-Math.random()) < .25) {
+//                build(RobotType.FULFILLMENT_CENTER);
+//            }
         }else{
 
 //Refinery cost 200
@@ -111,12 +123,15 @@ public class Miner extends Unit {
 
         // Fulfillment Center cost 150
         //numFulfillmentCenters += comms.getNewFulfillmentCenterCount();
+        numFulfillmentCenters = comms.getNewFulfillmentCenterCount();
         System.out.println("numfulfillmentcenters: " + numFulfillmentCenters);
-        if(rc.getRoundNum() > 350 && Soup >= 150 && numFulfillmentCenters < 2) {
+        if(rc.getRoundNum() > 350 && Soup >= 150 && numFulfillmentCenters < 1 && Math.random() < 0.25) {
             System.out.println("Drone facility in progress");
-            build(RobotType.FULFILLMENT_CENTER);
-            //while(!tryBuild(RobotType.FULFILLMENT_CENTER, Util.randomDirection())) ;
+            //build(RobotType.FULFILLMENT_CENTER);
+            while(!tryBuild(RobotType.FULFILLMENT_CENTER, Util.randomDirection())) ;
+            FFLocs.add(rc.getLocation());
             comms.broadcastFulfillmentCenterCreation(rc.getLocation());
+            comms.updateFFCCreation(FFLocs);
         }
 
 //----------------------------------Searching for --------------------------------
