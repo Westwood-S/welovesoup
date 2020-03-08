@@ -15,9 +15,6 @@ public class HQ extends Shooter {
          this.team = rc.getTeam();
         comms.sendHqLoc(loc);
         comms.broadcastSoupLocation(rc.senseNearbySoup()[0]);
-
-//        comms.broadcastDigLocations(placeToDig);
-
     }
 
     public void takeTurn() throws GameActionException {

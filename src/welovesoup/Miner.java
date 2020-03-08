@@ -27,7 +27,7 @@ public class Miner extends Unit {
 
     public void takeTurn() throws GameActionException {
         super.takeTurn();
-        System.out.println("bid: " + comms.getBidValue());
+        //System.out.println("bid: " + comms.getBidValue());
         numDesignSchools += comms.getNewDesignSchoolCount();
 //        numNetgun += comms.getGunCount();
         //numFulfillmentCenters += comms.getNewFulfillmentCenterCount();
@@ -82,12 +82,12 @@ public class Miner extends Unit {
 //net gun cost 250
 //        if(rc.getRoundNum()>300 && Soup >= 1050 && numNetgun < 5 && disToHQ> 8 && disToHQ < 20) {
 //            System.out.println("Trying gun"); build(RobotType.NET_GUN); ++numNetgun; }
-        if(Soup >= 250 && numNetgun < 1) {
-            System.out.println("Trying gun");
-            //build(RobotType.NET_GUN); ++numNetgun;
-            tryBuild(RobotType.NET_GUN, hqLoc.directionTo(hqLoc.translate(30,30)));
-            ++numNetgun;
-        }
+//        if(Soup >= 250 && numNetgun < 1) {
+//            System.out.println("Trying gun");
+//            //build(RobotType.NET_GUN); ++numNetgun;
+//            //tryBuild(RobotType.NET_GUN, hqLoc.directionTo(hqLoc.translate(30,30)));
+//            ++numNetgun;
+//        }
 
 // Fulfillment Center cost 150
             //System.out.println("numfulfillmentcenters: " + numFulfillmentCenters);
@@ -124,7 +124,7 @@ public class Miner extends Unit {
         // Fulfillment Center cost 150
         //numFulfillmentCenters += comms.getNewFulfillmentCenterCount();
         numFulfillmentCenters = comms.getNewFulfillmentCenterCount();
-        System.out.println("numfulfillmentcenters: " + numFulfillmentCenters);
+        //System.out.println("numfulfillmentcenters: " + numFulfillmentCenters);
         if(rc.getRoundNum() > 350 && Soup >= 150 && numFulfillmentCenters < 1 && Math.random() < 0.25) {
             System.out.println("Drone facility in progress");
             //build(RobotType.FULFILLMENT_CENTER);
@@ -259,8 +259,6 @@ public class Miner extends Unit {
                     return;
                 }
        // stuck = true;
-
-        System.out.println("Stuck");
     }
 }
 

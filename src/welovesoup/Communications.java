@@ -20,11 +20,60 @@ public class Communications {
         "fullfillment center created",                      // 4
         "vaporator created",                                // 5
         "Not sorrounded",                                   // 6
-        "Has enemy"                                         // 7 
+        "Has enemy",                                        // 7
+        "water"                                             // 8
     };
 
     public Communications(RobotController r) {
         rc = r;
+    }
+
+    public void sendWaterLoc(MapLocation loc) throws GameActionException {
+        int[] message = new int[7];
+        int bid = getBidValue();
+        message[0] = teamSecret;
+        message[1] = 8;
+        message[2] = loc.x; // x coord of HQ
+        message[3] = loc.y; // y coord of HQ
+        if (rc.canSubmitTransaction(message, bid))
+            rc.submitTransaction(message, bid);
+    }
+
+    public MapLocation getWaterLocFromBlockchain() throws GameActionException {
+        for (int i = 1; i < rc.getRoundNum(); i++){
+            for(Transaction tx : rc.getBlock(i)) {
+                int[] mess = tx.getMessage();
+                if(mess[0] == teamSecret && mess[1] == 8){
+                    System.out.println("found water!");
+                    return new MapLocation(mess[2], mess[3]);
+                }
+            }
+        }
+        return null;
+    }
+
+    public void sendOpponentHQLoc(MapLocation loc) throws GameActionException {
+        int[] message = new int[7];
+        int bid = getBidValue();
+        message[0] = teamSecret;
+        message[1] = 7;
+        message[2] = loc.x; // x coord of HQ
+        message[3] = loc.y; // y coord of HQ
+        if (rc.canSubmitTransaction(message, bid))
+            rc.submitTransaction(message, bid);
+    }
+
+    public MapLocation getOpponentHQLoc() throws GameActionException {
+        for (int i = 1; i < rc.getRoundNum(); i++){
+            for(Transaction tx : rc.getBlock(i)) {
+                int[] mess = tx.getMessage();
+                if(mess[0] == teamSecret && mess[1] == 7){
+                    System.out.println("enemy found!");
+                    return new MapLocation(mess[2], mess[3]);
+                }
+            }
+        }
+        return null;
     }
 
     public void sendHqLoc(MapLocation loc) throws GameActionException {

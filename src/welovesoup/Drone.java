@@ -23,37 +23,31 @@ public class Drone extends Unit {
 
     public Drone(RobotController r) {
         super(r);
+        try {
+            opponentHQ = comms.getOpponentHQLoc();
+        } catch (GameActionException ex) {
+            ex.printStackTrace();
+        }
     }
 
     public void takeTurn() throws GameActionException {
         super.takeTurn();
         findHQ();
         robotInfos = rc.senseNearbyRobots();
-        if(rc.isCurrentlyHoldingUnit()) {
-            Direction dir = Util.randomDirection();
-            while(!rc.senseFlooding(rc.getLocation().add(dir)))
-                nav.goTo(Util.randomDirection());
-            if(rc.canDropUnit(dir))
-                rc.dropUnit(dir);
-            System.out.println("drone holding unit");
+        if(rc.isCurrentlyHoldingUnit() && opponentHQ == null) {
+            findOpponentHQ();
+            if(opponentHQ != null)
+                dropUnitToOpponentHQ();
         } else if (robotInfos.length > 0) {
             for (RobotInfo r : robotInfos) {
                 if (r.team == rc.getTeam().opponent()) {
-                    opponentHQ = r.location;
-                    if(rc.getLocation().distanceSquaredTo(r.location) > GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED) {
-                        System.out.println("far enough");
-                        System.out.println(rc.getLocation().distanceSquaredTo(r.location));
-                        nav.goTo(hqLoc);
-                    } else {
-                        System.out.println("too close: move towards HQ");
-                        System.out.println(rc.getLocation().distanceSquaredTo(r.location));
+                    if(rc.getLocation().distanceSquaredTo(opponentHQ) <= GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED) {
                         nav.goTo(rc.getLocation().directionTo(hqLoc));
                     }
                 } else if ((r.type == RobotType.LANDSCAPER && r.team == rc.getTeam().opponent() && r.team == rc.getTeam() ||
                         r.type == RobotType.DESIGN_SCHOOL && r.team == rc.getTeam().opponent() || r.type == RobotType.MINER
                         && r.team == rc.getTeam().opponent()) &&
                         (rc.getLocation().distanceSquaredTo(r.location) > GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED)) {
-                    System.out.println(nav.goTo(r.location));
                     if (rc.canPickUpUnit(r.getID()))
                         rc.pickUpUnit(r.getID());
                     while (!rc.isCurrentlyHoldingUnit()) {
@@ -61,47 +55,25 @@ public class Drone extends Unit {
                         if (rc.canPickUpUnit(r.getID()))
                             rc.pickUpUnit(r.getID());
                     }
-                    System.out.println(r.getID());
-                } else if (r.type == RobotType.COW) {
+                } else if (r.type == RobotType.COW && !rc.isCurrentlyHoldingUnit()) {
+                    if (opponentHQ != null && (rc.getLocation().distanceSquaredTo(opponentHQ) < GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED+5)) {
+                        continue;
+                    }
                     while (!rc.getLocation().isAdjacentTo(r.location)) {
                         nav.goTo(r.location);
                     }
                     if (rc.canPickUpUnit(r.getID()))
                         rc.pickUpUnit(r.getID());
-                } else {
-                    //System.out.println("move square, circle or towards HQ");
-                    if (opponentHQ != null && rc.getLocation().distanceSquaredTo(opponentHQ) < GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED) {
-                        checkRobots(rc.senseNearbyRobots());
-                        nav.goTo(hqLoc);
-                    }
-                    if(rc.getRoundNum() < 900) {
-                        droneFly(Direction.SOUTH);
-                        droneFly(Direction.WEST);
-                        droneFly(Direction.NORTH);
-                        droneFly(Direction.EAST);
-                        //rotateAround(origin, 5);
-                    } else if (rc.getRoundNum() < 2100) {
-                        rotateAround(new MapLocation(15,16), 5, 1500);
-                    } else nav.goTo(hqLoc);
+                    System.out.println("COW caught!");
                 }
             }
+        }
+        rotateAround(hqLoc, 5, 1500);
+        if(opponentHQ == null) {
+            findOpponentHQ();
         } else {
-            if (opponentHQ == null)
-                    searchForOpponentHQ();
-            if (opponentHQ != null) {
-                System.out.println("OPPONENT");
-                System.out.println(rc.getLocation().distanceSquaredTo(opponentHQ));
-                checkRobots(rc.senseNearbyRobots());
-                nav.goTo(hqLoc);
-            } else {
-                System.out.println("drone is flying now :)");
-                checkRobots(rc.senseNearbyRobots());
-                droneFly(Direction.SOUTH);
-                droneFly(Direction.WEST);
-                droneFly(Direction.NORTH);
-                droneFly(Direction.EAST);
-                nav.goTo(hqLoc);
-            }
+            System.out.println(opponentHQ);
+            System.out.println("oppoHQ");
         }
     }
 
@@ -110,24 +82,34 @@ public class Drone extends Unit {
         if(dir == Direction.SOUTH) {
             while (!rc.getLocation().isAdjacentTo(new MapLocation(34, 5))) {
                 checkRobots(rc.senseNearbyRobots());
+                if(opponentHQ != null)
+                    break;
                 nav.goTo(target);
             }
         } else if (dir == Direction.WEST){
             target = new MapLocation(5,5);
             while (!rc.getLocation().isAdjacentTo(target)) {
                 checkRobots(rc.senseNearbyRobots());
+                if(opponentHQ != null)
+                    break;
                 nav.goTo(target);
             }
         } else if (dir == Direction.NORTH){
-            target = new MapLocation(5,21);
+            if(opponentHQ != null)
+                target = new MapLocation(5,20);
+            else target = new MapLocation(5,21);
             while (!rc.getLocation().isAdjacentTo(target)) {
                 checkRobots(rc.senseNearbyRobots());
+                if(opponentHQ != null)
+                    break;
                 nav.goTo(target);
             }
         } else if (dir == Direction.EAST){
             target = new MapLocation(35,25);
             while (!rc.getLocation().isAdjacentTo(target)) {
                 checkRobots(rc.senseNearbyRobots());
+                if(opponentHQ != null)
+                    break;
                 nav.goTo(target);
             }
         }
@@ -142,11 +124,11 @@ public class Drone extends Unit {
             X = origin.x + cos(radians) * radius;
             Y = origin.y + sin(radians) * radius;
             nextLoc = new MapLocation((int) X, (int) Y);
-            checkRobots(rc.senseNearbyRobots());
+            //checkRobots(rc.senseNearbyRobots());
             nav.goTo(nextLoc);
             if ((int) angle >= 360)
                 angle = 0;
-            if (loops < cnt)
+            if (loops < cnt || opponentHQ == null)
                 break;
             else
                 cnt++;
@@ -154,30 +136,17 @@ public class Drone extends Unit {
     }
 
     public void checkRobots(RobotInfo[] robotInfos) throws GameActionException {
-        if(rc.isCurrentlyHoldingUnit()) {
-            Direction dir = Util.randomDirection();
-            while (!rc.senseFlooding(rc.getLocation().add(dir)))
-                nav.goTo(Util.randomDirection());
-            if (rc.canDropUnit(dir))
-                rc.dropUnit(dir);
-        }
+        if(rc.senseFlooding(rc.getLocation()))
+            comms.sendWaterLoc(rc.getLocation());
         if (robotInfos != null) {
             for (RobotInfo r : robotInfos) {
-                if (r.team == rc.getTeam().opponent()) {
+                if (opponentHQ == null && r.team == rc.getTeam().opponent()) {
+                    System.out.println("opponent found!!!");
                     opponentHQ = r.location;
-                    if (rc.getLocation().distanceSquaredTo(r.location) > GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED) {
-                        System.out.println("far enough");
-                        System.out.println(rc.getLocation().distanceSquaredTo(r.location));
-                    } else {
-                        System.out.println("too close: move towards HQ");
-                        System.out.println(rc.getLocation().distanceSquaredTo(r.location));
-                        nav.goTo(rc.getLocation().directionTo(hqLoc));
-                    }
-                } else if ((r.type == RobotType.LANDSCAPER && r.team == rc.getTeam().opponent() && r.team == rc.getTeam() ||
-                        r.type == RobotType.DESIGN_SCHOOL && r.team == rc.getTeam().opponent() || r.type == RobotType.MINER
-                        && r.team == rc.getTeam().opponent()) &&
-                        (rc.getLocation().distanceSquaredTo(r.location) > GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED)) {
-                    System.out.println(nav.goTo(r.location));
+                    comms.sendOpponentHQLoc(opponentHQ);
+                } else if ((r.type == RobotType.LANDSCAPER && r.team == rc.getTeam().opponent() ||
+                        r.type == RobotType.MINER && r.team == rc.getTeam().opponent()) &&
+                        (rc.getLocation().distanceSquaredTo(opponentHQ) > GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED)) {
                     if (rc.canPickUpUnit(r.getID()))
                         rc.pickUpUnit(r.getID());
                     while (!rc.isCurrentlyHoldingUnit()) {
@@ -185,22 +154,71 @@ public class Drone extends Unit {
                         if (rc.canPickUpUnit(r.getID()))
                             rc.pickUpUnit(r.getID());
                     }
-                    System.out.println(r.getID());
-                } else if (r.type == RobotType.COW) {
+                    System.out.println("r.type == RobotType.LANDSCAPER");
+                } else if (!rc.isCurrentlyHoldingUnit() && r.type == RobotType.COW) {
+                    if (opponentHQ != null && (rc.getLocation().distanceSquaredTo(opponentHQ) < GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED+5)) {
+                        continue;
+                    }
                     while (!rc.getLocation().isAdjacentTo(r.location)) {
                         nav.goTo(r.location);
                         if (rc.canPickUpUnit(r.getID()))
                             rc.pickUpUnit(r.getID());
+//                        else if(rc.isCurrentlyHoldingUnit())
+//                            break;
                     }
                     if (rc.canPickUpUnit(r.getID()))
                         rc.pickUpUnit(r.getID());
-                } else if (opponentHQ != null && rc.getLocation().distanceSquaredTo(opponentHQ) < GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED)
-                        nav.goTo(hqLoc);
-                if(r.type == RobotType.NET_GUN) {
-                    if(rc.canPickUpUnit(r.getID()))
-                        rc.pickUpUnit(r.getID());
+                    if(rc.isCurrentlyHoldingUnit()) {
+                        dropUnitToOpponentHQ();
+                        //dropUnitInWater();
+                    }
                 }
             }
+        }
+    }
+
+    public void dropUnitInWater() throws GameActionException{
+        MapLocation w = comms.getWaterLocFromBlockchain();
+        System.out.println(w);
+        System.out.println("dropUnitInWater!!!!!!!!!");
+        while(!rc.senseFlooding(rc.getLocation())) {
+            w = comms.getWaterLocFromBlockchain();
+            if(w != null)
+                nav.goTo(w);
+        }
+        if(rc.canDropUnit(Direction.CENTER))
+            rc.dropUnit(Direction.CENTER);
+    }
+
+    public void dropUnitToOpponentHQ() throws GameActionException {
+        MapLocation opHQ = comms.getOpponentHQLoc();
+        System.out.println(opHQ);
+        System.out.println("dropUnitToOpponentHQ!!!!!!!!!"+opponentHQ);
+        if(opponentHQ == null)
+            findOpponentHQ();
+        while(opponentHQ != null && rc.getLocation().distanceSquaredTo(opponentHQ) > GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED
+        && rc.getLocation().distanceSquaredTo(opponentHQ) < GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED+5) {
+            //opHQ = comms.getOpponentHQLoc();
+            if(opponentHQ != null)
+                nav.goTo(opponentHQ);
+        }
+        Direction d;
+        if(opponentHQ != null) {
+            while (!rc.canDropUnit(d = Util.randomDirection())) ;
+            rc.dropUnit(d);
+            nav.goTo(hqLoc);
+        }
+        System.out.println("unit droped to opponent hq");
+    }
+
+    public void findOpponentHQ() throws GameActionException {
+        opponentHQ = comms.getOpponentHQLoc();
+        while(opponentHQ == null) {
+            searchForOpponentHQ();
+            droneFly(Direction.SOUTH);
+            droneFly(Direction.WEST);
+            droneFly(Direction.NORTH);
+            droneFly(Direction.EAST);
         }
     }
 
@@ -211,6 +229,7 @@ public class Drone extends Unit {
             for (RobotInfo robotInfo : robotInfos) {
                 if (robotInfo.type == RobotType.HQ && robotInfo.team == rc.getTeam().opponent()) {
                     opponentHQ = robotInfo.location;
+                    comms.sendOpponentHQLoc(opponentHQ);
                 }
             }
         }
