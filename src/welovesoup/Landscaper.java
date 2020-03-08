@@ -4,6 +4,8 @@ import battlecode.common.*;
 import java.util.ArrayList;
 import java.util.Map;
 
+import static battlecode.common.Direction.*;
+
 public class Landscaper extends Unit {
     int dirtCarrying = 0;
     boolean nextToHQ = false;
@@ -66,8 +68,6 @@ public class Landscaper extends Unit {
                 if (bestPlaceToBuildWall != null) {
                     if (rc.canDepositDirt(rc.getLocation().directionTo(bestPlaceToBuildWall))){
                         rc.depositDirt(rc.getLocation().directionTo(bestPlaceToBuildWall));
-                        //rc.setIndicatorDot(bestPlaceToBuildWall, 0, 255, 0);
-                        //System.out.println("wall best fit");
                     }
                 }
 
@@ -76,26 +76,44 @@ public class Landscaper extends Unit {
                 //System.out.println("wall under me");
             }
         }else if (dirtCarrying == 0 && rc.getLocation().distanceSquaredTo(hqLoc)<=2){
-            tryDig();
+            tryDig2();
         }
     }
 
-    boolean tryDig() throws GameActionException {
-        Direction dir;
+
+    boolean tryDig(Direction dir) throws GameActionException {
+//        Direction dir;
+        if(rc.canDigDirt(dir) && !rc.isLocationOccupied(rc.adjacentLocation(dir))){
+            rc.digDirt(dir);
+            rc.setIndicatorDot(rc.getLocation().add(dir), 255, 0, 0);
+            return true;
+        }
         if(hqLoc == null){
             dir = Util.randomDirection();
         } else {
             dir = hqLoc.directionTo(rc.getLocation());
         }
-        for(Direction dire : Util.directions) {
-            if(dire != Direction.CENTER && !rc.getLocation().add(dire).isAdjacentTo(hqLoc)) {
-                if (rc.canDigDirt(dire) && !rc.isLocationOccupied(rc.adjacentLocation(dire))) {
-                    rc.digDirt(dire);
-                    rc.setIndicatorDot(rc.getLocation().add(dire), 255, 0, 0);
-                    return true;
-                }
-            }
-        }
         return false;
+    }
+
+    void tryDig2() throws GameActionException {
+        Direction dir;
+        if(nextToHQ){
+           dir = hqLoc.directionTo(rc.getLocation()); //Direction in relation to hq
+           switch (dir) {
+               case NORTH: if(!tryDig(NORTH)) tryDig(NORTHEAST); break;
+               case NORTHEAST: if(!tryDig(NORTHWEST)) tryDig(SOUTHEAST); break;
+               case NORTHWEST:  if(!tryDig(NORTHEAST)) tryDig(SOUTHEAST); break;
+               case WEST:  if(!tryDig(WEST)) tryDig(SOUTHEAST); break;
+               case EAST:   if(!tryDig(EAST)) tryDig(SOUTHEAST); break;
+               case SOUTH: if(!tryDig(SOUTH)) tryDig(SOUTHEAST); break;
+               case SOUTHEAST: if(!tryDig(NORTHEAST)) tryDig(SOUTHWEST);  break;
+               case SOUTHWEST: if(!tryDig(NORTHWEST)) tryDig(SOUTHWEST); break;
+           }
+        }
+        else{
+            tryDig(NORTH);
+        }
+
     }
 }
