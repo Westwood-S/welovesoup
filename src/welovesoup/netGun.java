@@ -1,7 +1,6 @@
 package welovesoup;
 
 import battlecode.common.*;
-import finalbotc.NetGunManager;
 
 public class netGun extends Shooter {
     MapLocation myLoc;
