@@ -16,8 +16,9 @@ public class DesignSchool extends Building {
         comms.broadcastDesignSchoolCreation(rc.getLocation());
 
         if (rc.getRoundNum() < 550 && numLandScapers < 8) {
-            for (Direction dir : Util.directions)
-                if (tryBuild(RobotType.LANDSCAPER, dir)) {
+
+//            for (Direction dir : Util.directions)
+                if (tryBuild(RobotType.LANDSCAPER, Direction.EAST)) {
                     System.out.println("made a landscaper");
                     numLandScapers++;
                 }
