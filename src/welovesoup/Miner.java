@@ -1,10 +1,9 @@
 package welovesoup;
+
 import battlecode.common.*;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
 
 public class Miner extends Unit {
 
@@ -12,6 +11,8 @@ public class Miner extends Unit {
     int numFulfillmentCenters = 0;
     int numNetgun=0;
     int numVaporators=0;
+    boolean builder  = false;
+
     ArrayList<MapLocation> refineryLocations = new ArrayList<MapLocation>();
     ArrayList<MapLocation> vaporatorLocations = new ArrayList<MapLocation>();
     ArrayList<MapLocation> soupLocations = new ArrayList<MapLocation>();
@@ -25,7 +26,7 @@ public class Miner extends Unit {
 
     public void takeTurn() throws GameActionException {
         super.takeTurn();
-        
+        if(rc.getRoundNum() == 2) builder = true;
         numDesignSchools += comms.getNewDesignSchoolCount();
 
 //        numNetgun += comms.getGunCount();
@@ -40,7 +41,9 @@ public class Miner extends Unit {
         comms.updateVaporatorLocations(vaporatorLocations);
         comms.updateFFCCreation(FFLocs);
         numVaporators = vaporatorLocations.size();
-        checkSoup();
+
+        if( rc.getRoundNum() > 75 && !builder)
+            checkSoup();
         //checkRefny();
 
         Direction randomDir = Util.randomDirection();
@@ -48,31 +51,40 @@ public class Miner extends Unit {
         int Soup = rc.getTeamSoup();
 
 
-        if(stuck){
-            for(Direction dir : Util.directions)
-                if(nav.tryMove(dir))
-                    stuck = false;
-        }
-////---------------------------------------Trying to build------------------------------------
-        if(rc.getRoundNum() < 500 && Soup > 150) {
-//Vaporator cost 500
-            if (rc.getRoundNum() > 50 && Soup >= 500 && disToHQ > 8 && vaporatorLocations.size() < 3 ) {
-                System.out.println("Trying to build vaporator");
-                build(RobotType.VAPORATOR);
-            }
+//        if(stuck){
+//            for(Direction dir : Util.directions)
+//                if(nav.tryMove(dir))
+//                    stuck = false;
+//        }
 
 //Refinery cost 200
-            if (rc.getRoundNum() > 200 && Soup >= 200 && disToHQ > 53 && refineryLocations.size() == 0) {
-                build(RobotType.REFINERY);
-            }
+        if(builder) {
 //Design school cost 150
-            if (rc.getRoundNum() > 150 && numDesignSchools == 0 && (disToHQ >= 10 && disToHQ != 13 && disToHQ != 18 && disToHQ < 25)) {
+            MapLocation ToBuild = hqLoc.translate( 2, 1);
+            if (rc.getRoundNum() > 75 && numDesignSchools == 0 && Soup >= 150) { //(disToHQ >= 10 && disToHQ != 13 && disToHQ != 18 && disToHQ < 25)
+                while(!rc.getLocation().isAdjacentTo(ToBuild)) {
+                    nav.goTo(ToBuild);
+                    System.out.println("Heading towards: " + ToBuild + "Hq: " + hqLoc );
+                }
                 System.out.println("Trying School");
-                build(RobotType.DESIGN_SCHOOL);
+                if(tryBuild(RobotType.DESIGN_SCHOOL, rc.getLocation().directionTo(ToBuild)))
+                    comms.broadcastDesignSchoolCreation(ToBuild);
             }
+
+//            //Vaporator cost 500
+//            if (rc.getRoundNum() > 50 && Soup >= 500 && disToHQ > 8 && disToHQ<=20 && vaporatorLocations.size() < 1 ) {
+//                System.out.println("Trying to build vaporator");
+//                build(RobotType.VAPORATOR);
+//            }
+
 //net gun cost 250
 //        if(rc.getRoundNum()>300 && Soup >= 1050 && numNetgun < 5 && disToHQ> 8 && disToHQ < 20) {
 //            System.out.println("Trying gun"); build(RobotType.NET_GUN); ++numNetgun; }
+        }
+
+
+////---------------------------------------Trying to build------------------------------------
+        else if (rc.getRoundNum() < 500 && Soup > 150) {
 
 
 // Fulfillment Center cost 150
@@ -212,7 +224,11 @@ public class Miner extends Unit {
             }
         }
     }
+    public void buildSpecific(RobotType building, MapLocation loc) throws GameActionException{
+       if(tryBuild(building, rc.getLocation().directionTo(loc)) && rc.getLocation().isAdjacentTo(loc)){
 
+       }
+    }
     public void newMove() throws GameActionException {
         Direction dir = Util.randomDirection();
                 if(!previousLocations.contains(rc.adjacentLocation(dir)) && rc.canMove(dir)){
