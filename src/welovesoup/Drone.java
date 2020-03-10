@@ -34,11 +34,18 @@ public class Drone extends Unit {
         super.takeTurn();
         findHQ();
         robotInfos = rc.senseNearbyRobots();
+        if(rc.getRoundNum() > 1000) {
+            attack();
+            return;
+        }
         if(rc.isCurrentlyHoldingUnit() && opponentHQ == null) {
             findOpponentHQ();
             if(opponentHQ != null)
                 dropUnitToOpponentHQ();
+        } else if (rc.isCurrentlyHoldingUnit()) {
+            dropUnitToOpponentHQ();
         } else if (robotInfos.length > 0) {
+            robotInfos = rc.senseNearbyRobots();
             for (RobotInfo r : robotInfos) {
                 if (r.team == rc.getTeam().opponent()) {
                     if(rc.getLocation().distanceSquaredTo(opponentHQ) <= GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED) {
@@ -56,9 +63,9 @@ public class Drone extends Unit {
                             rc.pickUpUnit(r.getID());
                     }
                 } else if (r.type == RobotType.COW && !rc.isCurrentlyHoldingUnit()) {
-                    if (opponentHQ != null && (rc.getLocation().distanceSquaredTo(opponentHQ) < GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED+5)) {
-                        continue;
-                    }
+//                    if (opponentHQ != null && (rc.getLocation().distanceSquaredTo(opponentHQ) < GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED)) {
+//                        continue;
+//                    }
                     while (!rc.getLocation().isAdjacentTo(r.location)) {
                         nav.goTo(r.location);
                     }
@@ -234,4 +241,64 @@ public class Drone extends Unit {
             }
         }
     }
+
+    public void attack() throws GameActionException {
+        //rotateAttack(new MapLocation(20, 18), 7, 1500);
+
+        a();
+    }
+
+    public void rotateAttack(MapLocation target, int radius, int loops) throws GameActionException {
+        origin = target;
+        int cnt = 0;
+        while (angle <= 360) {
+            angle += PI / 20;
+            radians = angle * (PI / 180);
+            X = origin.x + cos(radians) * radius;
+            Y = origin.y + sin(radians) * radius;
+            nextLoc = new MapLocation((int) X, (int) Y);
+            //checkRobots(rc.senseNearbyRobots());
+//            if(rc.getLocation().distanceSquaredTo(opponentHQ) > GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED)
+                nav.goTo(nextLoc);
+//            else {
+//                nextLoc = nextLoc.translate((GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED - rc.getLocation().distanceSquaredTo(opponentHQ)),
+//                        (GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED - rc.getLocation().distanceSquaredTo(opponentHQ)));
+//            }
+            if ((int) angle >= 360)
+                angle = 0;
+            if (loops < cnt || opponentHQ == null)
+                break;
+            else
+                cnt++;
+        }
+    }
+
+    public void a() throws GameActionException {
+
+//        nav.goTo(rc.getLocation().add(Direction.WEST));
+//        nav.goTo(rc.getLocation().add(Direction.WEST));
+//        nav.goTo(rc.getLocation().add(Direction.WEST));
+//        nav.goTo(rc.getLocation().add(Direction.WEST));
+//        nav.goTo(rc.getLocation().add(Direction.WEST));
+//        nav.goTo(rc.getLocation().add(Direction.WEST));
+        nav.goTo(rc.getLocation().add(Direction.SOUTH));
+        nav.goTo(rc.getLocation().add(Direction.SOUTH));
+        nav.goTo(rc.getLocation().add(Direction.SOUTH));
+        nav.goTo(rc.getLocation().add(Direction.SOUTH));
+//        nav.goTo(rc.getLocation().add(Direction.EAST));
+//        nav.goTo(rc.getLocation().add(Direction.EAST));
+//        nav.goTo(rc.getLocation().add(Direction.EAST));
+//        nav.goTo(rc.getLocation().add(Direction.EAST));
+//        nav.goTo(rc.getLocation().add(Direction.EAST));
+//        nav.goTo(rc.getLocation().add(Direction.EAST));
+//        nav.goTo(rc.getLocation().add(Direction.NORTHEAST));
+        nav.goTo(rc.getLocation().add(Direction.NORTH));
+        nav.goTo(rc.getLocation().add(Direction.NORTH));
+        nav.goTo(rc.getLocation().add(Direction.NORTH));
+        nav.goTo(rc.getLocation().add(Direction.NORTH));
+        nav.goTo(rc.getLocation().add(Direction.NORTH));
+        nav.goTo(rc.getLocation().add(Direction.NORTH));
+//        nav.goTo(rc.getLocation().add(Direction.NORTHWEST));
+    }
+
 }

@@ -63,6 +63,30 @@ public class Miner extends Unit {
 //        if(rc.getTeamSoup() >= 500)
 //            build(RobotType.VAPORATOR);
 ////---------------------------------------Trying to build------------------------------------
+        RobotInfo[] robots = rc.senseNearbyRobots();
+        for(RobotInfo r: robots) {
+            if(r.team == rc.getTeam().opponent()) {
+                while(!rc.getLocation().isAdjacentTo(hqLoc)) {
+                    nav.goTo(hqLoc);
+                    if(rc.canMineSoup(Direction.CENTER))
+                        rc.mineSoup(Direction.CENTER);
+                }
+            }
+        }
+        if(rc.canMineSoup(Direction.CENTER))
+            rc.mineSoup(Direction.CENTER);
+
+        if(Soup >= 250 && numNetgun < 1) {
+        while(!rc.getLocation().isAdjacentTo(new MapLocation(hqLoc.add(Direction.EAST).x+1,hqLoc.add(Direction.EAST).y+2)))
+            nav.goTo(new MapLocation(hqLoc.add(Direction.EAST).x+1, hqLoc.add(Direction.EAST).y+2));
+            build(RobotType.NET_GUN);
+            ++numNetgun;
+        }
+        System.out.println(Soup);
+        if(Soup >= 500 && numVaporators < 1) {
+            build(RobotType.VAPORATOR);
+            ++numVaporators;
+        }
         if(rc.getRoundNum() < 500 && Soup > 150) {
 //Vaporator cost 500
             if (rc.getRoundNum() > 150 && Soup >= 500 && disToHQ > 8 && vaporatorLocations.size() < 3 ) {
