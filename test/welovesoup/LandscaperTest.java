@@ -26,9 +26,9 @@ public class LandscaperTest {
         landscaper.rc = Mockito.mock(RobotController.class);
         doAnswer((i)->{
             return true;
-        }).when(landscaper).tryDig();
-        landscaper.tryDig();
-        verify(landscaper, times(1)).tryDig();
+        }).when(landscaper).tryDig2();
+        landscaper.tryDig2();
+        verify(landscaper, times(1)).tryDig2();
     }
 
     @Test
@@ -38,9 +38,9 @@ public class LandscaperTest {
         doAnswer((i)->{
             landscaper.rc.digDirt(Direction.CENTER);
             return true;
-        }).when(landscaper).tryDig();
-        landscaper.tryDig();
-        verify(landscaper, times(1)).tryDig();
+        }).when(landscaper).tryDig2();
+        landscaper.tryDig2();
+        verify(landscaper, times(1)).tryDig2();
         verify(landscaper.rc, times(1)).digDirt(Direction.CENTER);
     }
 

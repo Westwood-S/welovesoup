@@ -1,10 +1,9 @@
 package welovesoup;
+
 import battlecode.common.*;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
 
 public class Miner extends Unit {
 
@@ -12,6 +11,9 @@ public class Miner extends Unit {
     int numFulfillmentCenters = 0;
     int numNetgun=0;
     int numVaporators=0;
+
+    boolean builder  = false;
+
 
     ArrayList<MapLocation> refineryLocations = new ArrayList<MapLocation>();
     ArrayList<MapLocation> vaporatorLocations = new ArrayList<MapLocation>();
@@ -27,12 +29,12 @@ public class Miner extends Unit {
 
     public void takeTurn() throws GameActionException {
         super.takeTurn();
-        //System.out.println("bid: " + comms.getBidValue());
+        if (rc.getRoundNum() == 2) builder = true;
         numDesignSchools += comms.getNewDesignSchoolCount();
 //        numNetgun += comms.getGunCount();
         //numFulfillmentCenters += comms.getNewFulfillmentCenterCount();
 
-        if (mysoupLocations.size()!=0)
+        if (mysoupLocations.size() != 0)
             mysoupLocations.clear();
 
         mysoupLocations.addAll(Arrays.asList(rc.senseNearbySoup()));
@@ -43,18 +45,15 @@ public class Miner extends Unit {
         comms.updateFFCCreation(FFLocs);
         numVaporators = vaporatorLocations.size();
 
-        checkSoup();
+        if (rc.getRoundNum() > 75 && !builder)
+            checkSoup();
+
         //checkRefny();
 
         Direction randomDir = Util.randomDirection();
         int disToHQ = rc.getLocation().distanceSquaredTo(hqLoc);
         int Soup = rc.getTeamSoup();
 
-        if(stuck){
-            for(Direction dir : Util.directions)
-                if(nav.tryMove(dir))
-                    stuck = false;
-        }
 //        if (Soup >= 250 && numNetgun < 2) {
 //            System.out.println("Trying gun");
 //            build(RobotType.NET_GUN);
@@ -64,156 +63,136 @@ public class Miner extends Unit {
 //            build(RobotType.VAPORATOR);
 ////---------------------------------------Trying to build------------------------------------
         RobotInfo[] robots = rc.senseNearbyRobots();
-        for(RobotInfo r: robots) {
-            if(r.team == rc.getTeam().opponent()) {
-                while(!rc.getLocation().isAdjacentTo(hqLoc)) {
+        for (RobotInfo r : robots) {
+            if (r.team == rc.getTeam().opponent()) {
+                while (!rc.getLocation().isAdjacentTo(hqLoc)) {
                     nav.goTo(hqLoc);
-                    if(rc.canMineSoup(Direction.CENTER))
+                    if (rc.canMineSoup(Direction.CENTER))
                         rc.mineSoup(Direction.CENTER);
                 }
             }
         }
-        if(rc.canMineSoup(Direction.CENTER))
+        if (rc.canMineSoup(Direction.CENTER))
             rc.mineSoup(Direction.CENTER);
 
-        if(Soup >= 250 && numNetgun < 1) {
-        while(!rc.getLocation().isAdjacentTo(new MapLocation(hqLoc.add(Direction.EAST).x+1,hqLoc.add(Direction.EAST).y+2)))
-            nav.goTo(new MapLocation(hqLoc.add(Direction.EAST).x+1, hqLoc.add(Direction.EAST).y+2));
+        if (Soup >= 250 && numNetgun < 1) {
+            while (!rc.getLocation().isAdjacentTo(new MapLocation(hqLoc.add(Direction.EAST).x + 1, hqLoc.add(Direction.EAST).y + 2)))
+                nav.goTo(new MapLocation(hqLoc.add(Direction.EAST).x + 1, hqLoc.add(Direction.EAST).y + 2));
             build(RobotType.NET_GUN);
             ++numNetgun;
         }
         System.out.println(Soup);
-        if(Soup >= 500 && numVaporators < 1) {
+        if (Soup >= 500 && numVaporators < 1) {
             build(RobotType.VAPORATOR);
             ++numVaporators;
         }
-        if(rc.getRoundNum() < 500 && Soup > 150) {
+        if (rc.getRoundNum() < 500 && Soup > 150) {
 //Vaporator cost 500
-            if (rc.getRoundNum() > 150 && Soup >= 500 && disToHQ > 8 && vaporatorLocations.size() < 3 ) {
+            if (rc.getRoundNum() > 150 && Soup >= 500 && disToHQ > 8 && vaporatorLocations.size() < 3) {
                 System.out.println("Trying to build vaporator");
                 build(RobotType.VAPORATOR);
             }
+        }
 
 //Refinery cost 200
-            if (rc.getRoundNum() > 200 && Soup >= 200 && disToHQ > 53 && refineryLocations.size() == 0) {
-                build(RobotType.REFINERY);
-            }
+            if (builder) {
 //Design school cost 150
-            if (rc.getRoundNum() > 50 && numDesignSchools == 0 && (disToHQ >= 10 && disToHQ != 13 && disToHQ != 18 && disToHQ < 25)) {
-                System.out.println("Trying School");
-                build(RobotType.DESIGN_SCHOOL);
-            }
+                MapLocation ToBuild = hqLoc.translate(2, 1);
+                if (rc.getRoundNum() > 75 && numDesignSchools == 0 && Soup >= 150) { //(disToHQ >= 10 && disToHQ != 13 && disToHQ != 18 && disToHQ < 25)
+                    while (!rc.getLocation().isAdjacentTo(ToBuild)) {
+                        nav.goTo(ToBuild);
+                        System.out.println("Heading towards: " + ToBuild + "Hq: " + hqLoc);
+                    }
+                    System.out.println("Trying School");
+                    if (tryBuild(RobotType.DESIGN_SCHOOL, rc.getLocation().directionTo(ToBuild)))
+                        comms.broadcastDesignSchoolCreation(ToBuild);
+                }
+
+//            //Vaporator cost 500
+//            if (rc.getRoundNum() > 50 && Soup >= 500 && disToHQ > 8 && disToHQ<=20 && vaporatorLocations.size() < 1 ) {
+//                System.out.println("Trying to build vaporator");
+//                build(RobotType.VAPORATOR);
+//            }
+
 //net gun cost 250
 //        if(rc.getRoundNum()>300 && Soup >= 1050 && numNetgun < 5 && disToHQ> 8 && disToHQ < 20) {
 //            System.out.println("Trying gun"); build(RobotType.NET_GUN); ++numNetgun; }
-//        if(Soup >= 250 && numNetgun < 1) {
-//            System.out.println("Trying gun");
-//            //build(RobotType.NET_GUN); ++numNetgun;
-//            //tryBuild(RobotType.NET_GUN, hqLoc.directionTo(hqLoc.translate(30,30)));
-//            ++numNetgun;
-//        }
+            }
+
+
+////---------------------------------------Trying to build------------------------------------
+            else if (rc.getRoundNum() < 500 && Soup > 150) {
 
 // Fulfillment Center cost 150
-            //System.out.println("numfulfillmentcenters: " + numFulfillmentCenters);
-//            if (rc.getRoundNum() > 350 && FFLocs.size() == 0 && (1-Math.random()) < .25) {
-//                build(RobotType.FULFILLMENT_CENTER);
-//            }
-        }else{
+                //System.out.println("numfulfillmentcenters: " + numFulfillmentCenters);
+                if (rc.getRoundNum() > 350 && FFLocs.size() == 0 && (1 - Math.random()) < .25) {
+                    build(RobotType.FULFILLMENT_CENTER);
+                }
+            } else {
 
 //Refinery cost 200
-            if (Soup >= 200 && disToHQ > 53 && refineryLocations.size() == 0) {
-                build(RobotType.REFINERY);
+                if (Soup >= 200 && disToHQ > 53 && refineryLocations.size() == 0) {
+                    build(RobotType.REFINERY);
+                }
+                if (Soup >= 500 && disToHQ > 8) {
+                    System.out.println("Trying to build vaporator");
+                    build(RobotType.VAPORATOR);
+                }
             }
-            if (Soup >= 500 && disToHQ > 8) {
-                System.out.println("Trying to build vaporator");
-                build(RobotType.VAPORATOR);
-            }
-        }
-////---------------------------------------Trying to build------------------------------------
-
-
-//Refinery cost 200
-//        if (rc.getRoundNum()> 100 && Soup >= 200 && disToHQ>53 && refineryLocations.size()==0) {
-//           build(RobotType.REFINERY);   }
-        //Design school cost 150
-        if (rc.getRoundNum() > 60 && Soup >= 150 && numDesignSchools == 0 && (disToHQ<=17 && disToHQ>4 && disToHQ!=9 && disToHQ!=13 && disToHQ!=18)) {
-            System.out.println("Trying School"); build(RobotType.DESIGN_SCHOOL); }
-//Vaporator cost 500
-//        if(rc.getRoundNum()> 100 && Soup >= 500 && disToHQ> 4){
-//            System.out.println("Trying to build vaporator"); build(RobotType.VAPORATOR); }
-//net gun cost 250
-//        if(rc.getRoundNum()>150 && Soup >= 250 && numNetgun == 0 && disToHQ> 4) {
-//            System.out.println("Trying gun"); build(RobotType.NET_GUN); }
-
-        // Fulfillment Center cost 150
-        //numFulfillmentCenters += comms.getNewFulfillmentCenterCount();
-        numFulfillmentCenters = comms.getNewFulfillmentCenterCount();
-        //System.out.println("numfulfillmentcenters: " + numFulfillmentCenters);
-        if(rc.getRoundNum() > 350 && Soup >= 150 && numFulfillmentCenters < 1 && Math.random() < 0.25) {
-            System.out.println("Drone facility in progress");
-            //build(RobotType.FULFILLMENT_CENTER);
-            while(!tryBuild(RobotType.FULFILLMENT_CENTER, Util.randomDirection())) ;
-            FFLocs.add(rc.getLocation());
-            comms.broadcastFulfillmentCenterCreation(rc.getLocation());
-            comms.updateFFCCreation(FFLocs);
-        }
 
 //----------------------------------Searching for --------------------------------
- //Refinery
-        for (Direction dir : Util.directions)
-            tryRefine(dir);
+            //Refinery
+            for (Direction dir : Util.directions)
+                tryRefine(dir);
 //Soup
-        for (Direction dir : Util.directions)
-            if (tryMine(dir)) {
-                MapLocation soupLoc = rc.getLocation().add(dir);
-                if (!soupLocations.contains(soupLoc))
-                    comms.broadcastSoupLocation(soupLoc);
-            }
+            for (Direction dir : Util.directions)
+                if (tryMine(dir)) {
+                    MapLocation soupLoc = rc.getLocation().add(dir);
+                    if (!soupLocations.contains(soupLoc))
+                        comms.broadcastSoupLocation(soupLoc);
+                }
 
-       int maxSoup = RobotType.MINER.soupLimit;
+            int maxSoup = RobotType.MINER.soupLimit;
 //------------------------------Nav-----------------------------------
-        if (rc.getRoundNum()>280 && rc.getLocation().isAdjacentTo(hqLoc))
-            rc.disintegrate();
-        if (rc.getRoundNum()>130) {
-            if (rc.getSoupCarrying() == maxSoup){
-                if (refineryLocations.size() == 0) {
-                    if (rc.getRoundNum()> 100 && Soup >= 200 && disToHQ>53 && refineryLocations.size()==0) {
-                        build(RobotType.REFINERY);
-                    } else{
-                        newMove();}
-                } else
+            if (rc.getRoundNum() > 280 && rc.getLocation().isAdjacentTo(hqLoc))
+                rc.disintegrate();
+            if (rc.getRoundNum() > 130) {
+                if (rc.getSoupCarrying() == maxSoup) {
+                    if (refineryLocations.size() == 0) {
+                        if (rc.getRoundNum() > 100 && Soup >= 200 && disToHQ > 53 && refineryLocations.size() == 0) {
+                            build(RobotType.REFINERY);
+                        } else {
+                            newMove();
+                        }
+                    } else
+                        nav.goTo(refineryLocations.get(0));
+                } else if (soupLocations.size() > 0)
+                    nav.goTo(soupLocations.get(0));
+                else if (mysoupLocations.size() > 0)
+                    nav.goTo(mysoupLocations.get(0));
+                else
+                    newMove();
+            } else if (rc.getSoupCarrying() == maxSoup) {
+                // time to go back to the HQ
+                if (nav.goTo(hqLoc))
+                    System.out.println("moved towards HQ");
+                else if (refineryLocations.size() > 0)
                     nav.goTo(refineryLocations.get(0));
-            }
-            else if (soupLocations.size() > 0) 
+                else {
+                    newMove();
+                    //System.out.println("I moved randomly!");
+                }
+            } else if (soupLocations.size() > 0) {
                 nav.goTo(soupLocations.get(0));
-            else if (mysoupLocations.size() > 0) 
+            } else if (mysoupLocations.size() > 0) {
                 nav.goTo(mysoupLocations.get(0));
-            else
-                newMove();
-        }
-        else if (rc.getSoupCarrying() == maxSoup) {
-            // time to go back to the HQ
-            if (nav.goTo(hqLoc))
-                System.out.println("moved towards HQ");
-            else if (refineryLocations.size() > 0)
-                nav.goTo(refineryLocations.get(0));
-            else {
+            } else {
                 newMove();
                 //System.out.println("I moved randomly!");
             }
-        } 
-        else if (soupLocations.size() > 0) {
-            nav.goTo(soupLocations.get(0));
-        } 
-        else if (mysoupLocations.size() > 0) {
-            nav.goTo(mysoupLocations.get(0));
-        } 
-        else{
-            newMove();
-            //System.out.println("I moved randomly!");
+            //System.out.println("Bytes left: " + Clock.getBytecodesLeft());
         }
-        //System.out.println("Bytes left: " + Clock.getBytecodesLeft());
-    }
+
 
     /**
      * Attempts to mine soup in a given direction.
@@ -275,7 +254,11 @@ public class Miner extends Unit {
             }
         }
     }
+    public void buildSpecific(RobotType building, MapLocation loc) throws GameActionException{
+       if(tryBuild(building, rc.getLocation().directionTo(loc)) && rc.getLocation().isAdjacentTo(loc)){
 
+       }
+    }
     public void newMove() throws GameActionException {
         Direction dir = Util.randomDirection();
                 if(!previousLocations.contains(rc.adjacentLocation(dir)) && rc.canMove(dir)){
