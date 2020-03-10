@@ -61,45 +61,6 @@ public class Miner extends Unit {
         int disToHQ = rc.getLocation().distanceSquaredTo(hqLoc);
         int Soup = rc.getTeamSoup();
 
-//        if (Soup >= 250 && numNetgun < 2) {
-//            System.out.println("Trying gun");
-//            build(RobotType.NET_GUN);
-//            ++numNetgun;
-//        }
-//        if(rc.getTeamSoup() >= 500)
-//            build(RobotType.VAPORATOR);
-////---------------------------------------Trying to build------------------------------------
-        RobotInfo[] robots = rc.senseNearbyRobots();
-        for (RobotInfo r : robots) {
-            if (r.team == rc.getTeam().opponent()) {
-                while (!rc.getLocation().isAdjacentTo(hqLoc)) {
-                    nav.goTo(hqLoc);
-                    if (rc.canMineSoup(Direction.CENTER))
-                        rc.mineSoup(Direction.CENTER);
-                }
-            }
-        }
-        if (rc.canMineSoup(Direction.CENTER))
-            rc.mineSoup(Direction.CENTER);
-
-        if (Soup >= 250 && numNetgun < 1) {
-            while (!rc.getLocation().isAdjacentTo(new MapLocation(hqLoc.add(Direction.EAST).x + 1, hqLoc.add(Direction.EAST).y + 2)))
-                nav.goTo(new MapLocation(hqLoc.add(Direction.EAST).x + 1, hqLoc.add(Direction.EAST).y + 2));
-            build(RobotType.NET_GUN);
-            ++numNetgun;
-        }
-        System.out.println(Soup);
-        if (Soup >= 500 && numVaporators < 1) {
-            build(RobotType.VAPORATOR);
-            ++numVaporators;
-        }
-        if (rc.getRoundNum() < 500 && Soup > 150) {
-//Vaporator cost 500
-            if (rc.getRoundNum() > 150 && Soup >= 500 && disToHQ > 8 && vaporatorLocations.size() < 3) {
-                System.out.println("Trying to build vaporator");
-                build(RobotType.VAPORATOR);
-            }
-        }
 
 //Refinery cost 200
         if(builder && rc.getRoundNum() >= 75) {
@@ -295,4 +256,46 @@ public class Miner extends Unit {
        // stuck = true;
     }
 }
+
+
+//-------------------------------------------OVI'S Weird code xD--------------------------
+//        if (Soup >= 250 && numNetgun < 2) {
+//            System.out.println("Trying gun");
+//            build(RobotType.NET_GUN);
+//            ++numNetgun;
+//        }
+//        if(rc.getTeamSoup() >= 500)
+//            build(RobotType.VAPORATOR);
+////---------------------------------------Trying to build------------------------------------
+//        RobotInfo[] robots = rc.senseNearbyRobots();
+//        for (RobotInfo r : robots) {
+//            if (r.team == rc.getTeam().opponent()) {
+//                while (!rc.getLocation().isAdjacentTo(hqLoc)) {
+//                    nav.goTo(hqLoc);
+//                    if (rc.canMineSoup(Direction.CENTER))
+//                        rc.mineSoup(Direction.CENTER);
+//                }
+//            }
+//        }
+//        if (rc.canMineSoup(Direction.CENTER))
+//            rc.mineSoup(Direction.CENTER);
+//
+//        if (Soup >= 250 && numNetgun < 1) {
+//            while (!rc.getLocation().isAdjacentTo(new MapLocation(hqLoc.add(Direction.EAST).x + 1, hqLoc.add(Direction.EAST).y + 2)))
+//                nav.goTo(new MapLocation(hqLoc.add(Direction.EAST).x + 1, hqLoc.add(Direction.EAST).y + 2));
+//            build(RobotType.NET_GUN);
+//            ++numNetgun;
+//        }
+//        System.out.println(Soup);
+//        if (Soup >= 500 && numVaporators < 1) {
+//            build(RobotType.VAPORATOR);
+//            ++numVaporators;
+//        }
+//        if (rc.getRoundNum() < 500 && Soup > 150) {
+////Vaporator cost 500
+//            if (rc.getRoundNum() > 150 && Soup >= 500 && disToHQ > 8 && vaporatorLocations.size() < 3) {
+//                System.out.println("Trying to build vaporator");
+//                build(RobotType.VAPORATOR);
+//            }
+//        }
 
