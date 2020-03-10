@@ -20,11 +20,60 @@ public class Communications {
         "fullfillment center created",                      // 4
         "vaporator created",                                // 5
         "Not sorrounded",                                   // 6
-        "Has enemy"                                         // 7 
+        "Has enemy",                                        // 7
+        "water"                                             // 8
     };
 
     public Communications(RobotController r) {
         rc = r;
+    }
+
+    public void sendWaterLoc(MapLocation loc) throws GameActionException {
+        int[] message = new int[7];
+        int bid = getBidValue();
+        message[0] = teamSecret;
+        message[1] = 8;
+        message[2] = loc.x; // x coord of HQ
+        message[3] = loc.y; // y coord of HQ
+        if (rc.canSubmitTransaction(message, bid))
+            rc.submitTransaction(message, bid);
+    }
+
+    public MapLocation getWaterLocFromBlockchain() throws GameActionException {
+        for (int i = 1; i < rc.getRoundNum(); i++){
+            for(Transaction tx : rc.getBlock(i)) {
+                int[] mess = tx.getMessage();
+                if(mess[0] == teamSecret && mess[1] == 8){
+                    System.out.println("found water!");
+                    return new MapLocation(mess[2], mess[3]);
+                }
+            }
+        }
+        return null;
+    }
+
+    public void sendOpponentHQLoc(MapLocation loc) throws GameActionException {
+        int[] message = new int[7];
+        int bid = getBidValue();
+        message[0] = teamSecret;
+        message[1] = 7;
+        message[2] = loc.x; // x coord of HQ
+        message[3] = loc.y; // y coord of HQ
+        if (rc.canSubmitTransaction(message, bid))
+            rc.submitTransaction(message, bid);
+    }
+
+    public MapLocation getOpponentHQLoc() throws GameActionException {
+        for (int i = 1; i < rc.getRoundNum(); i++){
+            for(Transaction tx : rc.getBlock(i)) {
+                int[] mess = tx.getMessage();
+                if(mess[0] == teamSecret && mess[1] == 7){
+                    System.out.println("enemy found!");
+                    return new MapLocation(mess[2], mess[3]);
+                }
+            }
+        }
+        return null;
     }
 
     public void sendHqLoc(MapLocation loc) throws GameActionException {
@@ -125,20 +174,20 @@ public class Communications {
         }
     }
 
-
     public void broadcastFulfillmentCenterCreation(MapLocation loc) throws GameActionException {
-        if(filfillmentcreationbroadcastedcreation) return; // don't re-broadcast
+        //if(filfillmentcreationbroadcastedcreation) return; // don't re-broadcast
         int[] message = new int[7];
         message[0] = teamSecret;
         message[1] = 4;
         message[2] = loc.x; // x coord of HQ
         message[3] = loc.y; // y coord of HQ
-        if (rc.canSubmitTransaction(message, 6)) {
-            rc.submitTransaction(message, 6);
+        if (rc.canSubmitTransaction(message, 3)) {
+            rc.submitTransaction(message, 3);
             System.out.println("new fulfillment center!" + loc);
             filfillmentcreationbroadcastedcreation = true;
         }
     }
+
     public void updateFFCCreation(ArrayList<MapLocation> FFCLoc) throws GameActionException{
         for(Transaction tx: rc.getBlock(rc.getRoundNum() - 1)){
             int[] mess = tx.getMessage();
@@ -148,6 +197,7 @@ public class Communications {
             }
         }
     }
+
     public int getNewFulfillmentCenterCount() throws GameActionException {
         int count = 0;
         for(Transaction tx : rc.getBlock(rc.getRoundNum() - 1)) {
@@ -159,7 +209,6 @@ public class Communications {
         }
         return count;
     }
-
 
     public void broadcastVaporatorLocation(MapLocation loc) throws GameActionException {
         int[] message = new int[7];
@@ -262,6 +311,27 @@ public class Communications {
             }
         }
         return false;
+    }
+
+    int getBidValue(){
+        try {
+            int r = rc.getRoundNum();
+            if (r <= 1) return 1;
+            Transaction[] transactions = rc.getBlock(r-1);
+            int ans = 1;
+            if (transactions.length < GameConstants.NUMBER_OF_TRANSACTIONS_PER_BLOCK) return 1;
+            for (Transaction t : transactions){
+                if (t == null) return 1;
+                if ((t.getMessage()[6]) != r-1){
+                    int b = t.getCost();
+                    if (b >= ans) ans = b+1;
+                }
+            }
+            return ans;
+        } catch (Throwable t){
+            t.printStackTrace();
+        }
+        return 1;
     }
 }
 

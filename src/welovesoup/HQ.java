@@ -5,16 +5,16 @@ import java.util.ArrayList;
 
 public class HQ extends Shooter {
     static int numMiners = 0;
+
     Team team;
     ArrayList<MapLocation> placeToDig = new ArrayList<MapLocation>();
+
     public HQ(RobotController r) throws GameActionException {
         super(r);
         MapLocation loc = rc.getLocation();
          this.team = rc.getTeam();
         comms.sendHqLoc(loc);
         comms.broadcastSoupLocation(rc.senseNearbySoup()[0]);
-
-//        comms.broadcastDigLocations(placeToDig);
     }
 
     public void takeTurn() throws GameActionException {

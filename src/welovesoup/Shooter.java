@@ -11,6 +11,7 @@ public class Shooter extends Building {
         super.takeTurn();
 
         RobotInfo[] robots = rc.senseNearbyRobots(rc.getCurrentSensorRadiusSquared(),rc.getTeam().opponent());
+
         for (RobotInfo robot : robots) {
             if (robot.type == RobotType.LANDSCAPER || robot.type == RobotType.DESIGN_SCHOOL || robot.type == RobotType.MINER || robot.type == RobotType.DELIVERY_DRONE) {
                 if (rc.canShootUnit(robot.ID)) {

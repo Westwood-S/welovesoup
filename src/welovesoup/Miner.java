@@ -11,13 +11,16 @@ public class Miner extends Unit {
     int numFulfillmentCenters = 0;
     int numNetgun=0;
     int numVaporators=0;
+
     boolean builder  = false;
     int numRefinerys = 0;
+
 
     ArrayList<MapLocation> refineryLocations = new ArrayList<MapLocation>();
     ArrayList<MapLocation> vaporatorLocations = new ArrayList<MapLocation>();
     ArrayList<MapLocation> soupLocations = new ArrayList<MapLocation>();
     ArrayList<MapLocation> mysoupLocations = new ArrayList<MapLocation>();
+
     ArrayList<MapLocation> FFLocs = new ArrayList<MapLocation>();
     ArrayList<MapLocation> netGunLocations = new ArrayList<MapLocation>();
     boolean stuck = false;
@@ -32,12 +35,12 @@ public class Miner extends Unit {
             builder = true;
             addLocations();
         }
-        numDesignSchools += comms.getNewDesignSchoolCount();
 
+        numDesignSchools += comms.getNewDesignSchoolCount();
 //        numNetgun += comms.getGunCount();
         //numFulfillmentCenters += comms.getNewFulfillmentCenterCount();
 
-        if (mysoupLocations.size()!=0)
+        if (mysoupLocations.size() != 0)
             mysoupLocations.clear();
 
         mysoupLocations.addAll(Arrays.asList(rc.senseNearbySoup()));
@@ -45,23 +48,58 @@ public class Miner extends Unit {
         comms.updateRefnyLocations(refineryLocations);
         numRefinerys += refineryLocations.size();
 //        comms.updateVaporatorLocations(vaporatorLocations);
+
         comms.updateFFCCreation(FFLocs);
         numVaporators = vaporatorLocations.size();
 
-        if( rc.getRoundNum() > 75 && !builder)
+        if (rc.getRoundNum() > 75 && !builder)
             checkSoup();
+
         //checkRefny();
 
         Direction randomDir = Util.randomDirection();
         int disToHQ = rc.getLocation().distanceSquaredTo(hqLoc);
         int Soup = rc.getTeamSoup();
 
-
-//        if(stuck){
-//            for(Direction dir : Util.directions)
-//                if(nav.tryMove(dir))
-//                    stuck = false;
+//        if (Soup >= 250 && numNetgun < 2) {
+//            System.out.println("Trying gun");
+//            build(RobotType.NET_GUN);
+//            ++numNetgun;
 //        }
+//        if(rc.getTeamSoup() >= 500)
+//            build(RobotType.VAPORATOR);
+////---------------------------------------Trying to build------------------------------------
+        RobotInfo[] robots = rc.senseNearbyRobots();
+        for (RobotInfo r : robots) {
+            if (r.team == rc.getTeam().opponent()) {
+                while (!rc.getLocation().isAdjacentTo(hqLoc)) {
+                    nav.goTo(hqLoc);
+                    if (rc.canMineSoup(Direction.CENTER))
+                        rc.mineSoup(Direction.CENTER);
+                }
+            }
+        }
+        if (rc.canMineSoup(Direction.CENTER))
+            rc.mineSoup(Direction.CENTER);
+
+        if (Soup >= 250 && numNetgun < 1) {
+            while (!rc.getLocation().isAdjacentTo(new MapLocation(hqLoc.add(Direction.EAST).x + 1, hqLoc.add(Direction.EAST).y + 2)))
+                nav.goTo(new MapLocation(hqLoc.add(Direction.EAST).x + 1, hqLoc.add(Direction.EAST).y + 2));
+            build(RobotType.NET_GUN);
+            ++numNetgun;
+        }
+        System.out.println(Soup);
+        if (Soup >= 500 && numVaporators < 1) {
+            build(RobotType.VAPORATOR);
+            ++numVaporators;
+        }
+        if (rc.getRoundNum() < 500 && Soup > 150) {
+//Vaporator cost 500
+            if (rc.getRoundNum() > 150 && Soup >= 500 && disToHQ > 8 && vaporatorLocations.size() < 3) {
+                System.out.println("Trying to build vaporator");
+                build(RobotType.VAPORATOR);
+            }
+        }
 
 //Refinery cost 200
         if(builder && rc.getRoundNum() >= 75) {
@@ -105,63 +143,53 @@ public class Miner extends Unit {
 
 
 ////---------------------------------------Trying to build------------------------------------
-        else if (rc.getRoundNum() < 500 && Soup > 150) {
+            else if (rc.getRoundNum() < 500 && Soup > 150) {
+                if (Soup >= 200 && disToHQ > 53 && refineryLocations.size() == 0) {
+                    build(RobotType.REFINERY);
+            }
 
-
-// Fulfillment Center cost 150
-            //System.out.println("numfulfillmentcenters: " + numFulfillmentCenters);
-//            if (rc.getRoundNum() > 350 && FFLocs.size() == 0 && Math.random() * 1 < .25) {
-//                build(RobotType.FULFILLMENT_CENTER);
-//            }
-        }else{
+        }
 
 //Refinery cost 200
-            if (Soup >= 200 && disToHQ > 53 && refineryLocations.size() == 0) {
-                build(RobotType.REFINERY);
-            }
+
 //            if (Soup >= 500 && disToHQ > 8) {
 //                System.out.println("Trying to build vaporator");
 //                build(RobotType.VAPORATOR);
 //            }
 
-
-        }
-
-
 //----------------------------------Searching for --------------------------------
- //Refinery
-        for (Direction dir : Util.directions)
-            tryRefine(dir);
+            //Refinery
+            for (Direction dir : Util.directions)
+                tryRefine(dir);
 //Soup
-        for (Direction dir : Util.directions)
-            if (tryMine(dir)) {
-                MapLocation soupLoc = rc.getLocation().add(dir);
-                if (!soupLocations.contains(soupLoc))
-                    comms.broadcastSoupLocation(soupLoc);
-            }
+            for (Direction dir : Util.directions)
+                if (tryMine(dir)) {
+                    MapLocation soupLoc = rc.getLocation().add(dir);
+                    if (!soupLocations.contains(soupLoc))
+                        comms.broadcastSoupLocation(soupLoc);
+                }
 
-       int maxSoup = RobotType.MINER.soupLimit;
+            int maxSoup = RobotType.MINER.soupLimit;
 //------------------------------Nav-----------------------------------
-//        if (rc.getRoundNum()>280 && rc.getLocation().isAdjacentTo(hqLoc))
+//        if (rc.getRoundNum() > 280 && rc.getLocation().isAdjacentTo(hqLoc))
 //            rc.disintegrate();
-        if (rc.getRoundNum()>200) {
-            if (rc.getSoupCarrying() == maxSoup){
+        if (rc.getRoundNum() > 200) {
+            if (rc.getSoupCarrying() == maxSoup) {
                 if (refineryLocations.size() == 0) {
-                    if (rc.getRoundNum()> 100 && Soup >= 200 && disToHQ>53 && refineryLocations.size()==0) {
+                    if (rc.getRoundNum() > 100 && Soup >= 200 && disToHQ > 53 && refineryLocations.size() == 0) {
                         build(RobotType.REFINERY);
-                    } else{
-                        newMove();}
+                    } else {
+                        newMove();
+                    }
                 } else
                     nav.goTo(refineryLocations.get(0));
-            }
-            else if (soupLocations.size() > 0) 
+            } else if (soupLocations.size() > 0)
                 nav.goTo(soupLocations.get(0));
-            else if (mysoupLocations.size() > 0) 
+            else if (mysoupLocations.size() > 0)
                 nav.goTo(mysoupLocations.get(0));
             else
                 newMove();
-        }
-        else if (rc.getSoupCarrying() == maxSoup) {
+        } else if (rc.getSoupCarrying() == maxSoup) {
             // time to go back to the HQ
             if (nav.goTo(hqLoc))
                 System.out.println("moved towards HQ");
@@ -171,14 +199,11 @@ public class Miner extends Unit {
                 newMove();
                 //System.out.println("I moved randomly!");
             }
-        } 
-        else if (soupLocations.size() > 0) {
+        } else if (soupLocations.size() > 0) {
             nav.goTo(soupLocations.get(0));
-        } 
-        else if (mysoupLocations.size() > 0) {
+        } else if (mysoupLocations.size() > 0) {
             nav.goTo(mysoupLocations.get(0));
-        } 
-        else{
+        } else {
             newMove();
             //System.out.println("I moved randomly!");
         }
@@ -268,8 +293,6 @@ public class Miner extends Unit {
                     return;
                 }
        // stuck = true;
-
-        System.out.println("Stuck");
     }
 }
 
