@@ -15,10 +15,6 @@ public class Landscaper extends Unit {
 
     public Landscaper(RobotController r) {
         super(r);
-//        digLocations.add(hqLoc.translate(2, 0 ));
-//        digLocations.add(hqLoc.translate(-2, 0));
-//        digLocations.add(hqLoc.translate(0, 2));
-//        digLocations.add(hqLoc.translate(0, -2));
     }
 
 
@@ -78,6 +74,8 @@ public class Landscaper extends Unit {
         }else if (dirtCarrying == 0 && rc.getLocation().distanceSquaredTo(hqLoc)<=2){
             tryDig2();
         }
+
+        if(!nextToHQ) { System.out.println("We made it"); }
     }
 
 
@@ -114,6 +112,13 @@ public class Landscaper extends Unit {
         else{
             tryDig(NORTH);
         }
+    }
+
+    void whereToGo(){
+        int vision = rc.getCurrentSensorRadiusSquared();
+        MapLocation me = rc.getLocation();
+//        Direction[] directionArray = dir
 
     }
+
 }

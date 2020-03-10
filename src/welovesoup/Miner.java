@@ -56,7 +56,7 @@ public class Miner extends Unit {
 ////---------------------------------------Trying to build------------------------------------
         if(rc.getRoundNum() < 500 && Soup > 150) {
 //Vaporator cost 500
-            if (rc.getRoundNum() > 50 && Soup >= 500 && disToHQ > 8 && vaporatorLocations.size() < 3 ) {
+            if (rc.getRoundNum() > 50 && Soup >= 500 && disToHQ > 8 && disToHQ<=20 && vaporatorLocations.size() < 1 ) {
                 System.out.println("Trying to build vaporator");
                 build(RobotType.VAPORATOR);
             }
