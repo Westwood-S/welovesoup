@@ -12,12 +12,14 @@ public class Miner extends Unit {
     int numNetgun=0;
     int numVaporators=0;
     boolean builder  = false;
+    int numRefinerys = 0;
 
     ArrayList<MapLocation> refineryLocations = new ArrayList<MapLocation>();
     ArrayList<MapLocation> vaporatorLocations = new ArrayList<MapLocation>();
     ArrayList<MapLocation> soupLocations = new ArrayList<MapLocation>();
     ArrayList<MapLocation> mysoupLocations = new ArrayList<MapLocation>();
     ArrayList<MapLocation> FFLocs = new ArrayList<MapLocation>();
+    ArrayList<MapLocation> netGunLocations = new ArrayList<MapLocation>();
     boolean stuck = false;
 
     public Miner(RobotController r) {
@@ -26,7 +28,10 @@ public class Miner extends Unit {
 
     public void takeTurn() throws GameActionException {
         super.takeTurn();
-        if(rc.getRoundNum() == 2) builder = true;
+        if(rc.getRoundNum() == 2){
+            builder = true;
+            addLocations();
+        }
         numDesignSchools += comms.getNewDesignSchoolCount();
 
 //        numNetgun += comms.getGunCount();
@@ -38,7 +43,8 @@ public class Miner extends Unit {
         mysoupLocations.addAll(Arrays.asList(rc.senseNearbySoup()));
         comms.updateSoupLocations(soupLocations);
         comms.updateRefnyLocations(refineryLocations);
-        comms.updateVaporatorLocations(vaporatorLocations);
+        numRefinerys += refineryLocations.size();
+//        comms.updateVaporatorLocations(vaporatorLocations);
         comms.updateFFCCreation(FFLocs);
         numVaporators = vaporatorLocations.size();
 
@@ -58,28 +64,43 @@ public class Miner extends Unit {
 //        }
 
 //Refinery cost 200
-        if(builder) {
-//Design school cost 150
-            MapLocation ToBuild = hqLoc.translate( 2, 1);
-            if (rc.getRoundNum() > 75 && numDesignSchools == 0 && Soup >= 150) { //(disToHQ >= 10 && disToHQ != 13 && disToHQ != 18 && disToHQ < 25)
+        if(builder && rc.getRoundNum() >= 75) {
+//            if(round )
+            if (rc.getRoundNum() > 100 && numDesignSchools == 0 && Soup >= 150) { //(disToHQ >= 10 && disToHQ != 13 && disToHQ != 18 && disToHQ < 25)
+                MapLocation ToBuild = hqLoc.translate( 2, 1);
                 while(!rc.getLocation().isAdjacentTo(ToBuild)) {
                     nav.goTo(ToBuild);
-                    System.out.println("Heading towards: " + ToBuild + "Hq: " + hqLoc );
+//                    System.out.println("Heading towards: " + ToBuild + "Hq: " + hqLoc );
                 }
                 System.out.println("Trying School");
                 if(tryBuild(RobotType.DESIGN_SCHOOL, rc.getLocation().directionTo(ToBuild)))
-                    comms.broadcastDesignSchoolCreation(ToBuild);
+                    numDesignSchools++;
             }
 
-//            //Vaporator cost 500
-//            if (rc.getRoundNum() > 50 && Soup >= 500 && disToHQ > 8 && disToHQ<=20 && vaporatorLocations.size() < 1 ) {
-//                System.out.println("Trying to build vaporator");
-//                build(RobotType.VAPORATOR);
-//            }
+            if (rc.getRoundNum() > 50 && Soup >= 500 && vaporatorLocations.size() != 0) {
+                while(!rc.getLocation().isAdjacentTo(vaporatorLocations.get(0))){
+                    nav.goTo(vaporatorLocations.get(0));
+                }
+                System.out.println("Trying to build vaporator");
+                if(tryBuild(RobotType.VAPORATOR, rc.getLocation().directionTo(vaporatorLocations.get(0)))){
+                   vaporatorLocations.remove(0);
+                }
+            }
 
-//net gun cost 250
-//        if(rc.getRoundNum()>300 && Soup >= 1050 && numNetgun < 5 && disToHQ> 8 && disToHQ < 20) {
-//            System.out.println("Trying gun"); build(RobotType.NET_GUN); ++numNetgun; }
+            if (rc.getRoundNum() > 500 && Soup >= 250 && netGunLocations.size() != 0) {
+                while(!rc.getLocation().isAdjacentTo(netGunLocations.get(0))){
+                    nav.goTo(netGunLocations.get(0));
+                }
+                System.out.println("Trying to build vaporator");
+                if(tryBuild(RobotType.NET_GUN, rc.getLocation().directionTo(netGunLocations.get(0)))){
+                    netGunLocations.remove(0);
+                }
+            }
+            if(rc.getLocation() != hqLoc.translate(3,3)){
+                nav.goTo(hqLoc.translate(3,3));
+            }else {
+                return;
+            }
         }
 
 
@@ -89,19 +110,19 @@ public class Miner extends Unit {
 
 // Fulfillment Center cost 150
             //System.out.println("numfulfillmentcenters: " + numFulfillmentCenters);
-            if (rc.getRoundNum() > 350 && FFLocs.size() == 0 && Math.random() * 1 < .25) {
-                build(RobotType.FULFILLMENT_CENTER);
-            }
+//            if (rc.getRoundNum() > 350 && FFLocs.size() == 0 && Math.random() * 1 < .25) {
+//                build(RobotType.FULFILLMENT_CENTER);
+//            }
         }else{
 
 //Refinery cost 200
             if (Soup >= 200 && disToHQ > 53 && refineryLocations.size() == 0) {
                 build(RobotType.REFINERY);
             }
-            if (Soup >= 500 && disToHQ > 8) {
-                System.out.println("Trying to build vaporator");
-                build(RobotType.VAPORATOR);
-            }
+//            if (Soup >= 500 && disToHQ > 8) {
+//                System.out.println("Trying to build vaporator");
+//                build(RobotType.VAPORATOR);
+//            }
 
 
         }
@@ -121,9 +142,9 @@ public class Miner extends Unit {
 
        int maxSoup = RobotType.MINER.soupLimit;
 //------------------------------Nav-----------------------------------
-        if (rc.getRoundNum()>280 && rc.getLocation().isAdjacentTo(hqLoc))
-            rc.disintegrate();
-        if (rc.getRoundNum()>130) {
+//        if (rc.getRoundNum()>280 && rc.getLocation().isAdjacentTo(hqLoc))
+//            rc.disintegrate();
+        if (rc.getRoundNum()>200) {
             if (rc.getSoupCarrying() == maxSoup){
                 if (refineryLocations.size() == 0) {
                     if (rc.getRoundNum()> 100 && Soup >= 200 && disToHQ>53 && refineryLocations.size()==0) {
@@ -224,10 +245,21 @@ public class Miner extends Unit {
             }
         }
     }
-    public void buildSpecific(RobotType building, MapLocation loc) throws GameActionException{
-       if(tryBuild(building, rc.getLocation().directionTo(loc)) && rc.getLocation().isAdjacentTo(loc)){
 
-       }
+    public void addLocations(){
+
+        vaporatorLocations.add(hqLoc.translate(2, -1));
+        vaporatorLocations.add(hqLoc.translate(1, 2));
+        vaporatorLocations.add(hqLoc.translate(-1, 2));
+        vaporatorLocations.add(hqLoc.translate(-2, 1));
+        vaporatorLocations.add(hqLoc.translate(-2, -1));
+        vaporatorLocations.add(hqLoc.translate(-1, -2));
+        vaporatorLocations.add(hqLoc.translate(1, -2));
+
+        netGunLocations.add(hqLoc.translate(2, 2));
+        netGunLocations.add(hqLoc.translate(-2, 2));
+        netGunLocations.add(hqLoc.translate(-2, -2));
+        netGunLocations.add(hqLoc.translate(2, -2));
     }
     public void newMove() throws GameActionException {
         Direction dir = Util.randomDirection();

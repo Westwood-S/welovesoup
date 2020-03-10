@@ -15,16 +15,21 @@ public class DesignSchool extends Building {
         // will only actually happen if we haven't already broadcasted the creation
         comms.broadcastDesignSchoolCreation(rc.getLocation());
 
-        if (rc.getRoundNum() < 550 && numLandScapers < 8) {
+        if ( numLandScapers < 8) {
 
 //            for (Direction dir : Util.directions)
                 if (tryBuild(RobotType.LANDSCAPER, Direction.EAST)) {
                     System.out.println("made a landscaper");
                     numLandScapers++;
+                }else{
+                    if(tryBuild(RobotType.LANDSCAPER, Direction.SOUTHEAST)){
+                        numLandScapers++;
+                    }
+
                 }
-        } else if (rc.getTeamSoup() > 1000){
-            for (Direction dir : Util.directions)
-                if (tryBuild(RobotType.LANDSCAPER, dir)) {
+        } else if (rc.getTeamSoup() > 600 && numLandScapers < 27){
+//            for (Direction dir : Util.directions)
+                if (tryBuild(RobotType.LANDSCAPER, Direction.EAST)) {
                     System.out.println("made a landscaper");
                     numLandScapers++;
                 }
