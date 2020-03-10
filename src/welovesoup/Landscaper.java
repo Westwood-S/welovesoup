@@ -75,7 +75,9 @@ public class Landscaper extends Unit {
             tryDig2();
         }
 
-        if(!nextToHQ) { System.out.println("We made it"); }
+        if(!nextToHQ) {
+            //Here
+            System.out.println("We made it"); }
     }
 
 
