@@ -25,7 +25,8 @@ public class HQ extends Shooter {
             System.out.println("Not sorrounded");
         }
         if(rc.getMapHeight() < 64){
-            if(numMiners < 5) {
+
+            if(numMiners < 10) {
                 //for (Direction dir : Util.directions)
                 if (tryBuild(RobotType.MINER, Util.randomDirection())) {
                     numMiners++;

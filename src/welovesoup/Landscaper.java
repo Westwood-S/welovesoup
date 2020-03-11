@@ -23,10 +23,21 @@ public class Landscaper extends Unit {
         dirtCarrying = rc.getDirtCarrying();
         nextToHQ = rc.getLocation().isAdjacentTo(hqLoc);
         comms.updateVaporatorLocations(vaporatorLocs);
+
         if(nextToHQ && !isMoreRoomCloseToHq()) {
             comms.broadcastSecondWall();
         }
         System.out.println("second wall can begin: "+ comms.getSecondWall());
+
+
+        if(rc.getRoundNum() >= 500) {
+            for (RobotInfo r:rc.senseNearbyRobots()) {
+                if(r.type == RobotType.NET_GUN){
+                    nav.goTo(r.location);
+                }
+            }
+        }
+
         if(rc.getRoundNum() >= 351 && rc.getRoundNum() % 50 == 1)
             surrounded = comms.updateSurrounded();
 

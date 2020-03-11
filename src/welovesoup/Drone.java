@@ -175,10 +175,16 @@ public class Drone extends Unit {
                     }
                     if (rc.canPickUpUnit(r.getID()))
                         rc.pickUpUnit(r.getID());
+
                     if(rc.isCurrentlyHoldingUnit()) {
                         dropUnitToOpponentHQ();
                         //dropUnitInWater();
                     }
+                } else if (opponentHQ != null && rc.getLocation().distanceSquaredTo(opponentHQ) < GameConstants.NET_GUN_SHOOT_RADIUS_SQUARED)
+                        nav.goTo(hqLoc);
+                if(r.type == RobotType.NET_GUN) {
+                    if(rc.canPickUpUnit(r.getID()))
+                        rc.pickUpUnit(r.getID());
                 }
             }
         }
