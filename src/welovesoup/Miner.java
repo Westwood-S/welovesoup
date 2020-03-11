@@ -29,7 +29,9 @@ public class Miner extends Unit {
 
     public void takeTurn() throws GameActionException {
         super.takeTurn();
+
         if (rc.getRoundNum() == 2) builder = true;
+
         numDesignSchools += comms.getNewDesignSchoolCount();
 //        numNetgun += comms.getGunCount();
         //numFulfillmentCenters += comms.getNewFulfillmentCenterCount();
@@ -53,7 +55,6 @@ public class Miner extends Unit {
         Direction randomDir = Util.randomDirection();
         int disToHQ = rc.getLocation().distanceSquaredTo(hqLoc);
         int Soup = rc.getTeamSoup();
-
 //        if (Soup >= 250 && numNetgun < 2) {
 //            System.out.println("Trying gun");
 //            build(RobotType.NET_GUN);
@@ -117,7 +118,13 @@ public class Miner extends Unit {
 //net gun cost 250
 //        if(rc.getRoundNum()>300 && Soup >= 1050 && numNetgun < 5 && disToHQ> 8 && disToHQ < 20) {
 //            System.out.println("Trying gun"); build(RobotType.NET_GUN); ++numNetgun; }
-            }
+// Fulfillment Center cost 150
+            //System.out.println("numfulfillmentcenters: " + numFulfillmentCenters);
+//            if (rc.getRoundNum() > 350 && FFLocs.size() == 0 && (1-Math.random()) < .25) {
+//                build(RobotType.FULFILLMENT_CENTER);
+//            }
+        }
+
 
 
 ////---------------------------------------Trying to build------------------------------------
@@ -128,17 +135,34 @@ public class Miner extends Unit {
                 if (rc.getRoundNum() > 350 && FFLocs.size() == 0 && (1 - Math.random()) < .25) {
                     build(RobotType.FULFILLMENT_CENTER);
                 }
-            } else {
+            }
 
 //Refinery cost 200
-                if (Soup >= 200 && disToHQ > 53 && refineryLocations.size() == 0) {
-                    build(RobotType.REFINERY);
-                }
-                if (Soup >= 500 && disToHQ > 8) {
-                    System.out.println("Trying to build vaporator");
-                    build(RobotType.VAPORATOR);
-                }
-            }
+//        if (rc.getRoundNum()> 100 && Soup >= 200 && disToHQ>53 && refineryLocations.size()==0) {
+//           build(RobotType.REFINERY);   }
+        //Design school cost 150
+        if (rc.getRoundNum() > 60 && Soup >= 150 && numDesignSchools == 0 && (disToHQ<=17 && disToHQ>4 && disToHQ!=9 && disToHQ!=13 && disToHQ!=18)) {
+            System.out.println("Trying School"); build(RobotType.DESIGN_SCHOOL); }
+//Vaporator cost 500
+//        if(rc.getRoundNum()> 100 && Soup >= 500 && disToHQ> 4){
+//            System.out.println("Trying to build vaporator"); build(RobotType.VAPORATOR); }
+//net gun cost 250
+//        if(rc.getRoundNum()>150 && Soup >= 250 && numNetgun == 0 && disToHQ> 4) {
+//            System.out.println("Trying gun"); build(RobotType.NET_GUN); }
+
+        // Fulfillment Center cost 150
+        //numFulfillmentCenters += comms.getNewFulfillmentCenterCount();
+        numFulfillmentCenters = comms.getNewFulfillmentCenterCount();
+        System.out.println("numfulfillmentcenters: " + numFulfillmentCenters);
+        if(rc.getRoundNum() > 350 && Soup >= 150 && numFulfillmentCenters < 1 && Math.random() < 0.25) {
+            System.out.println("Drone facility in progress");
+            //build(RobotType.FULFILLMENT_CENTER);
+            while(!tryBuild(RobotType.FULFILLMENT_CENTER, Util.randomDirection())) ;
+            FFLocs.add(rc.getLocation());
+            comms.broadcastFulfillmentCenterCreation(rc.getLocation());
+            comms.updateFFCCreation(FFLocs);
+        }
+
 
 //----------------------------------Searching for --------------------------------
             //Refinery

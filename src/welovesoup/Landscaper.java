@@ -24,6 +24,14 @@ public class Landscaper extends Unit {
         nextToHQ = rc.getLocation().isAdjacentTo(hqLoc);
         comms.updateVaporatorLocations(vaporatorLocs);
 
+        if(rc.getRoundNum() >= 500) {
+            for (RobotInfo r:rc.senseNearbyRobots()) {
+                if(r.type == RobotType.NET_GUN){
+                    nav.goTo(r.location);
+                }
+            }
+        }
+
         if(rc.getRoundNum() >= 351 && rc.getRoundNum() % 50 == 1)
             surrounded = comms.updateSurrounded();
 
