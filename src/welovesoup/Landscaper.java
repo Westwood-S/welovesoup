@@ -23,7 +23,10 @@ public class Landscaper extends Unit {
         dirtCarrying = rc.getDirtCarrying();
         nextToHQ = rc.getLocation().isAdjacentTo(hqLoc);
         comms.updateVaporatorLocations(vaporatorLocs);
-
+        if(nextToHQ && !isMoreRoomCloseToHq()) {
+            comms.broadcastSecondWall();
+        }
+        System.out.println("second wall can begin: "+ comms.getSecondWall());
         if(rc.getRoundNum() >= 351 && rc.getRoundNum() % 50 == 1)
             surrounded = comms.updateSurrounded();
 
@@ -61,24 +64,13 @@ public class Landscaper extends Unit {
         } else if (dirtCarrying == 0 && rc.getLocation().distanceSquaredTo(hqLoc)<=2){
             tryDig2();
         } else {
-            System.out.println("else...");
-            if(isMoreRoomCloseToHq()) {
+            if(!comms.getSecondWall()) {
                 System.out.println("IN IS MORE");
                 nextToHq();
-            }
-            else {
+            } else {
                 System.out.println("ELSE IS MORE");
                 buildSecondWall();
             }
-        }
-
-        if(!nextToHQ) {
-            //Here
-            System.out.println("We made it");
-            tryDig2();
-                if(rc.canDepositDirt(Direction.CENTER)) {
-                    rc.depositDirt(Direction.CENTER);
-                }
         }
     }
 
@@ -140,10 +132,9 @@ public class Landscaper extends Unit {
         while (!rc.isLocationOccupied(new MapLocation(hqLoc.add(Direction.SOUTHEAST).x, hqLoc.add(Direction.SOUTHEAST).y)))
             nav.goTo(new MapLocation(hqLoc.add(Direction.SOUTHEAST).x, hqLoc.add(Direction.SOUTHEAST).y));
 
-        while (!rc.getLocation().isAdjacentTo(hqLoc) && isMoreRoomCloseToHq()) {
-            nav.goTo(new MapLocation(hqLoc.add(Direction.NORTH).x, hqLoc.add(Direction.NORTH).y));
-            System.out.println("0000");
-        }
+//        while (!rc.getLocation().isAdjacentTo(hqLoc) ){//&& isMoreRoomCloseToHq()) {
+//            nav.goTo(new MapLocation(hqLoc.add(Direction.NORTH).x, hqLoc.add(Direction.NORTH).y));
+//        }
         if (rc.canDigDirt(Direction.CENTER))
             return rc.getLocation();
         return null;
@@ -189,30 +180,79 @@ public class Landscaper extends Unit {
         }
     }
 
+    MapLocation randPos() throws GameActionException {
+        MapLocation p1 = new MapLocation(hqLoc.x + 3, hqLoc.y + 3);
+        MapLocation p2 = new MapLocation(hqLoc.x + 3, hqLoc.y + 2);
+        MapLocation p3 = new MapLocation(hqLoc.x + 3, hqLoc.y + 1);
+        MapLocation p4 = new MapLocation(hqLoc.x + 3, hqLoc.y);
+        MapLocation p5 = new MapLocation(hqLoc.x + 3, hqLoc.y - 1);
+        MapLocation p6 = new MapLocation(hqLoc.x + 3, hqLoc.y - 2);
+        MapLocation p7 = new MapLocation(hqLoc.x + 3, hqLoc.y - 3);
+        MapLocation[] wall = {p1, p2, p3, p4, p5, p6, p7};
+        return wall[(int) (Math.random() * wall.length-1)];
+    }
 
     public void buildSecondWall() throws GameActionException {
         System.out.println("build second wall" + new MapLocation(hqLoc.x + 3, hqLoc.y + 3));
         MapLocation p1 = new MapLocation(hqLoc.x + 3, hqLoc.y + 3);
         MapLocation p2 = new MapLocation(hqLoc.x + 3, hqLoc.y + 2);
+        MapLocation p3 = new MapLocation(hqLoc.x + 3, hqLoc.y + 1);
+        MapLocation p4 = new MapLocation(hqLoc.x + 3, hqLoc.y);
+        MapLocation p5 = new MapLocation(hqLoc.x + 3, hqLoc.y - 1);
+        MapLocation p6 = new MapLocation(hqLoc.x + 3, hqLoc.y - 2);
+        MapLocation p7 = new MapLocation(hqLoc.x + 3, hqLoc.y - 3);
         if (!rc.isLocationOccupied(p1)) {
             while (rc.getLocation().distanceSquaredTo(p1) != 0)
                 nav.goTo(p1);
-            while (rc.canDigDirt(Direction.CENTER)) {
+            if (rc.canDigDirt(Direction.CENTER)) {
                 tryDig2();
                 if (rc.canDepositDirt(Direction.CENTER))
                     rc.depositDirt(Direction.CENTER);
                 //rc.setIndicatorDot(rc.getLocation().add(CENTER), 0, 155, 0);
             }
         } else if (!rc.isLocationOccupied(p2)) {
-            while (rc.getLocation().distanceSquaredTo(p2) != 0)
+            if (rc.getLocation().distanceSquaredTo(p2) != 0)
                 nav.goTo(p2);
             //while (rc.canDigDirt(Direction.CENTER)) {
                 tryDig3(Util.randomDirection());
                 if (rc.canDepositDirt(Direction.CENTER))
                     rc.depositDirt(Direction.CENTER);
             //}
+        } else if (!rc.isLocationOccupied(p3)) {
+            if (rc.getLocation().distanceSquaredTo(p3) != 0)
+                nav.goTo(p3);
+            //while (rc.canDigDirt(Direction.CENTER)) {
+            tryDig3(Util.randomDirection());
+            if (rc.canDepositDirt(Direction.CENTER))
+                rc.depositDirt(Direction.CENTER);
+            //}
+        } else if (!rc.isLocationOccupied(p4)) {
+            if (rc.getLocation().distanceSquaredTo(p4) != 0)
+                nav.goTo(p4);
+            //while (rc.canDigDirt(Direction.CENTER)) {
+            tryDig3(Util.randomDirection());
+            if (rc.canDepositDirt(Direction.CENTER))
+                rc.depositDirt(Direction.CENTER);
+        } else if (!rc.isLocationOccupied(p5)) {
+            if (rc.getLocation().distanceSquaredTo(p5) != 0)
+                nav.goTo(p5);
+            //while (rc.canDigDirt(Direction.CENTER)) {
+            tryDig3(Util.randomDirection());
+            if (rc.canDepositDirt(Direction.CENTER))
+                rc.depositDirt(Direction.CENTER);
+            //}
+        //}
+//        else if (!rc.isLocationOccupied(p6)) {
+//            while (rc.getLocation().distanceSquaredTo(p6) != 0)
+//                nav.goTo(p6);
+//            //while (rc.canDigDirt(Direction.CENTER)) {
+//            tryDig3(Util.randomDirection());
+//            if (rc.canDepositDirt(Direction.CENTER))
+//                rc.depositDirt(Direction.CENTER);
+            //}
+
         } else {
-        //    Clock.yield();
+            //nav.goTo(randPos());
             tryDig(WEST);
             tryDig(EAST);
             tryDig(SOUTH);

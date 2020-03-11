@@ -59,8 +59,8 @@ public class Miner extends Unit {
 //            build(RobotType.NET_GUN);
 //            ++numNetgun;
 //        }
-//        if(rc.getTeamSoup() >= 500)
-//            build(RobotType.VAPORATOR);
+        if(rc.getTeamSoup() >= 500)
+            build(RobotType.VAPORATOR);
 ////---------------------------------------Trying to build------------------------------------
         RobotInfo[] robots = rc.senseNearbyRobots();
         for (RobotInfo r : robots) {
