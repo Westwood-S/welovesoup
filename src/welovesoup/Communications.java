@@ -2,13 +2,13 @@ package welovesoup;
 import battlecode.common.*;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class Communications {
     RobotController rc;
 
     public boolean filfillmentcreationbroadcastedcreation = false;
     // state related only to communications should go here
-
     // all messages from our team should start with this so we can tell them apart
     static final int teamSecret = 163898578;
     // the second entry in every message tells us what kind of message it is. e.g. 0 means it contains the HQ location
