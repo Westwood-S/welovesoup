@@ -24,6 +24,20 @@ public class Landscaper extends Unit {
         nextToHQ = rc.getLocation().isAdjacentTo(hqLoc);
         comms.updateVaporatorLocations(vaporatorLocs);
 
+        if(!isMoreRoomCloseToHq()) {
+            comms.broadcastSecondWall();
+        }
+        System.out.println("second wall can begin: "+ comms.getSecondWall());
+
+
+        if(rc.getRoundNum() >= 500) {
+            for (RobotInfo r:rc.senseNearbyRobots()) {
+                if(r.type == RobotType.NET_GUN){
+                    nav.goTo(r.location);
+                }
+            }
+        }
+
         if(rc.getRoundNum() >= 351 && rc.getRoundNum() % 50 == 1)
             surrounded = comms.updateSurrounded();
 
@@ -32,16 +46,6 @@ public class Landscaper extends Unit {
             if(rc.canDigDirt(dirtohq)){
                 rc.digDirt(dirtohq);
             }
-        } else {
-//            if (Math.random()  < 0.4) {
-//                if (!nav.goTo(Util.randomDirection()))
-//                    if(rc.canDigDirt(dirtohq))
-//                        rc.digDirt(dirtohq);
-//            } else {
-    //                if (!nav.goTo(hqLoc))
-    //                    if(rc.canDigDirt(dirtohq))
-    //                        rc.digDirt(dirtohq);
-//            }
         }
         if (nextToHQ && dirtCarrying > 0 ){
             if(surrounded == 0){
@@ -67,36 +71,27 @@ public class Landscaper extends Unit {
                 }
             } else if(rc.canDepositDirt(Direction.CENTER)) {
                 rc.depositDirt(Direction.CENTER);
-                //System.out.println("wall under me");
             }
         } else if (dirtCarrying == 0 && rc.getLocation().distanceSquaredTo(hqLoc)<=2){
             tryDig2();
         } else {
-//            while(!rc.getLocation().isAdjacentTo(new MapLocation(33, 27)))
-//                nav.goTo(new MapLocation(33, 27));
-//            if(rc.canDepositDirt(Direction.CENTER))
-//                rc.depositDirt(Direction.CENTER);
-            isMoreRoomCloseToHq();
-            nextToHq();
+            if(!comms.getSecondWall()) {
+                System.out.println("IN IS MORE");
+                nextToHq();
+                System.out.println("OUTTT");
+            } else {
+                System.out.println("ELSE IS MORE");
+                buildSecondWall();
+            }
         }
-
-        if(!nextToHQ) {
-            //Here
-            System.out.println("We made it"); }
     }
 
 
     boolean tryDig(Direction dir) throws GameActionException {
-//        Direction dir;
         if(rc.canDigDirt(dir) && !rc.isLocationOccupied(rc.adjacentLocation(dir))){
             rc.digDirt(dir);
             rc.setIndicatorDot(rc.getLocation().add(dir), 255, 0, 0);
             return true;
-        }
-        if(hqLoc == null){
-            dir = Util.randomDirection();
-        } else {
-            dir = hqLoc.directionTo(rc.getLocation());
         }
         return false;
     }
@@ -104,42 +99,82 @@ public class Landscaper extends Unit {
 
     boolean isMoreRoomCloseToHq() throws GameActionException {
         System.out.println(hqLoc);
-
-        return true;
+        ArrayList<RobotInfo> landscapersNextToHQ = new ArrayList<>();
+//        boolean flag = false;
+//        do {
+//            try {
+//                flag = false;
+//                System.out.println("range: " + rc.getLocation().distanceSquaredTo(hqLoc) + "current rad: " + rc.getCurrentSensorRadiusSquared());
+                RobotInfo[] robotInfos = rc.senseNearbyRobots();
+                for(RobotInfo ri : robotInfos) {
+                    if(ri.type == RobotType.LANDSCAPER) {
+                        System.out.println("Location COORD: " + ri.getLocation());
+                        try {
+                            if(ri.location.isAdjacentTo(hqLoc))
+                                landscapersNextToHQ.add(ri);
+                        } catch (Exception e) {}
+                    }
+                }
+                System.out.println(landscapersNextToHQ.size());
+                if(landscapersNextToHQ.size() != 8)
+                    return true;
+                return false;
+//                if (rc.isLocationOccupied(new MapLocation(hqLoc.add(NORTH).x, hqLoc.add(NORTH).y)) &&
+//                        rc.isLocationOccupied(new MapLocation(hqLoc.add(NORTHWEST).x, hqLoc.add(NORTHWEST).y)) &&
+//                        rc.isLocationOccupied(new MapLocation(hqLoc.add(NORTHEAST).x, hqLoc.add(NORTHEAST).y)) &&
+//                        rc.isLocationOccupied(new MapLocation(hqLoc.add(EAST).x, hqLoc.add(EAST).y)) &&
+//                        rc.isLocationOccupied(new MapLocation(hqLoc.add(WEST).x, hqLoc.add(WEST).y)) &&
+//                        rc.isLocationOccupied(new MapLocation(hqLoc.add(SOUTH).x, hqLoc.add(SOUTH).y)) &&
+//                        rc.isLocationOccupied(new MapLocation(hqLoc.add(SOUTHEAST).x, hqLoc.add(SOUTHEAST).y)) &&
+//                        rc.isLocationOccupied(new MapLocation(hqLoc.add(SOUTHWEST).x, hqLoc.add(SOUTHWEST).y))) {
+//                    return false;
+//                }
+//            } catch (GameActionException e) {
+//                System.out.println("exception thwron for isLocationOccupied");
+//                //nav.goTo(hqLoc);
+//                flag = true;
+//                return false;
+//            }
+//        } while (flag == true);
+//        return true;
     }
 
     MapLocation nextToHq() throws GameActionException {
-
-//        System.out.println(rc.isLocationOccupied(new MapLocation(hqLoc.add(Direction.NORTH).x,hqLoc.add(Direction.NORTH).y)));
-//        System.out.println(rc.isLocationOccupied(new MapLocation(hqLoc.add(Direction.NORTH).x,hqLoc.add(Direction.NORTHEAST).y)));
-//        System.out.println(rc.isLocationOccupied(new MapLocation(hqLoc.add(Direction.NORTH).x,hqLoc.add(Direction.NORTHWEST).y)));
-//        System.out.println(rc.isLocationOccupied(new MapLocation(hqLoc.add(Direction.NORTH).x,hqLoc.add(Direction.SOUTH).y)));
-//        System.out.println(rc.isLocationOccupied(new MapLocation(hqLoc.add(Direction.NORTH).x,hqLoc.add(Direction.SOUTHEAST).y)));
-//        System.out.println(rc.isLocationOccupied(new MapLocation(hqLoc.add(Direction.NORTH).x,hqLoc.add(Direction.SOUTHWEST).y)));
-//        System.out.println(rc.isLocationOccupied(new MapLocation(hqLoc.add(Direction.NORTH).x,hqLoc.add(Direction.EAST).y)));
-//        System.out.println(rc.isLocationOccupied(new MapLocation(hqLoc.add(Direction.NORTH).x,hqLoc.add(Direction.WEST).y)));
-
-        while (!rc.getLocation().isAdjacentTo(new MapLocation(hqLoc.add(Direction.NORTH).x, hqLoc.add(Direction.NORTH).y)))
-            nav.goTo(new MapLocation(hqLoc.add(Direction.NORTH).x, hqLoc.add(Direction.NORTH).y));
-        while (!rc.isLocationOccupied(new MapLocation(hqLoc.add(Direction.NORTH).x, hqLoc.add(Direction.NORTH).y)))
-            nav.goTo(new MapLocation(hqLoc.add(Direction.NORTH).x, hqLoc.add(Direction.NORTH).y));
-        while (!rc.getLocation().isAdjacentTo(new MapLocation(hqLoc.add(Direction.NORTHEAST).x, hqLoc.add(Direction.NORTHEAST).y)))
-            nav.goTo(new MapLocation(hqLoc.add(Direction.NORTHEAST).x, hqLoc.add(Direction.NORTHEAST).y));
-        while (!rc.isLocationOccupied(new MapLocation(hqLoc.add(Direction.NORTHEAST).x, hqLoc.add(Direction.NORTHEAST).y)))
-            nav.goTo(new MapLocation(hqLoc.add(Direction.NORTHEAST).x, hqLoc.add(Direction.NORTHEAST).y));
-        while (!rc.isLocationOccupied(new MapLocation(hqLoc.add(Direction.EAST).x, hqLoc.add(Direction.EAST).y)))
-            nav.goTo(new MapLocation(hqLoc.add(Direction.EAST).x, hqLoc.add(Direction.EAST).y));
-        while (!rc.isLocationOccupied(new MapLocation(hqLoc.add(Direction.WEST).x, hqLoc.add(Direction.WEST).y)))
-            nav.goTo(new MapLocation(hqLoc.add(Direction.WEST).x, hqLoc.add(Direction.WEST).y));
-        while (!rc.isLocationOccupied(new MapLocation(hqLoc.add(Direction.SOUTH).x, hqLoc.add(Direction.SOUTH).y)))
-            nav.goTo(new MapLocation(hqLoc.add(Direction.SOUTH).x, hqLoc.add(Direction.SOUTH).y));
-        while (!rc.isLocationOccupied(new MapLocation(hqLoc.add(Direction.SOUTHWEST).x, hqLoc.add(Direction.SOUTHWEST).y)))
-            nav.goTo(new MapLocation(hqLoc.add(Direction.SOUTHWEST).x, hqLoc.add(Direction.SOUTHWEST).y));
-        while (!rc.isLocationOccupied(new MapLocation(hqLoc.add(Direction.SOUTHEAST).x, hqLoc.add(Direction.SOUTHEAST).y)))
-            nav.goTo(new MapLocation(hqLoc.add(Direction.SOUTHEAST).x, hqLoc.add(Direction.SOUTHEAST).y));
-
-        while (!rc.getLocation().isAdjacentTo(hqLoc))
-            nav.goTo(new MapLocation(hqLoc.add(Direction.NORTH).x, hqLoc.add(Direction.NORTH).y));
+        System.out.println("nextToHQ");
+        try {
+            if (!rc.isLocationOccupied(new MapLocation(hqLoc.add(Direction.NORTH).x, hqLoc.add(Direction.NORTH).y))) {
+                //nav.goTo(new MapLocation(hqLoc.add(Util.randomDirection()).x, hqLoc.add(Util.randomDirection()).y));
+                nav.goTo(new MapLocation(hqLoc.add(Direction.NORTH).x, hqLoc.add(Direction.NORTH).y));
+            }
+            if (!rc.isLocationOccupied(new MapLocation(hqLoc.add(Direction.NORTHEAST).x, hqLoc.add(Direction.NORTHEAST).y))) {
+                //nav.goTo(new MapLocation(hqLoc.add(Util.randomDirection()).x, hqLoc.add(Util.randomDirection()).y));
+                nav.goTo(new MapLocation(hqLoc.add(Direction.NORTHEAST).x, hqLoc.add(Direction.NORTHEAST).y));
+            }
+            if (!rc.isLocationOccupied(new MapLocation(hqLoc.add(NORTHWEST).x, hqLoc.add(NORTHWEST).y))) {
+                nav.goTo(new MapLocation(hqLoc.add(Util.randomDirection()).x, hqLoc.add(Util.randomDirection()).y));
+                nav.goTo(new MapLocation(hqLoc.add(NORTHWEST).x, hqLoc.add(NORTHWEST).y));
+            }
+            if (!rc.isLocationOccupied(new MapLocation(hqLoc.add(Direction.EAST).x, hqLoc.add(Direction.EAST).y))) {
+                nav.goTo(new MapLocation(hqLoc.add(Util.randomDirection()).x, hqLoc.add(Util.randomDirection()).y));
+                nav.goTo(new MapLocation(hqLoc.add(Direction.EAST).x, hqLoc.add(Direction.EAST).y));
+            }
+            if (!rc.isLocationOccupied(new MapLocation(hqLoc.add(Direction.WEST).x, hqLoc.add(Direction.WEST).y))) {
+                nav.goTo(new MapLocation(hqLoc.add(Util.randomDirection()).x, hqLoc.add(Util.randomDirection()).y));
+                nav.goTo(new MapLocation(hqLoc.add(Direction.WEST).x, hqLoc.add(Direction.WEST).y));
+            }
+            if (!rc.isLocationOccupied(new MapLocation(hqLoc.add(Direction.SOUTH).x, hqLoc.add(Direction.SOUTH).y))) {
+                nav.goTo(new MapLocation(hqLoc.add(Util.randomDirection()).x, hqLoc.add(Util.randomDirection()).y));
+                nav.goTo(new MapLocation(hqLoc.add(Direction.SOUTH).x, hqLoc.add(Direction.SOUTH).y));
+            }
+            if (!rc.isLocationOccupied(new MapLocation(hqLoc.add(Direction.SOUTHWEST).x, hqLoc.add(Direction.SOUTHWEST).y))) {
+                nav.goTo(new MapLocation(hqLoc.add(Util.randomDirection()).x, hqLoc.add(Util.randomDirection()).y));
+                nav.goTo(new MapLocation(hqLoc.add(Direction.SOUTHWEST).x, hqLoc.add(Direction.SOUTHWEST).y));
+            }
+            if (!rc.isLocationOccupied(new MapLocation(hqLoc.add(Direction.SOUTHEAST).x, hqLoc.add(Direction.SOUTHEAST).y))) {
+                nav.goTo(new MapLocation(hqLoc.add(Util.randomDirection()).x, hqLoc.add(Util.randomDirection()).y));
+                nav.goTo(new MapLocation(hqLoc.add(Direction.SOUTHEAST).x, hqLoc.add(Direction.SOUTHEAST).y));
+            }
+        } catch (Exception e) {}
         if (rc.canDigDirt(Direction.CENTER))
             return rc.getLocation();
         return null;
@@ -164,6 +199,95 @@ public class Landscaper extends Unit {
         else{
             tryDig(NORTH);
         }
+    }
+
+    void tryDig3(Direction dir) throws GameActionException {
+        if(nextToHQ){
+            //dir = hqLoc.directionTo(rc.getLocation()); //Direction in relation to hq
+            switch (dir) {
+                case NORTH: if(!tryDig(NORTH)) tryDig(NORTHEAST); break;
+                case NORTHEAST: if(!tryDig(NORTHWEST)) tryDig(SOUTHEAST); break;
+                case NORTHWEST:  if(!tryDig(NORTHEAST)) tryDig(SOUTHEAST); break;
+                case WEST:  if(!tryDig(WEST)) tryDig(SOUTHEAST); break;
+                case EAST:   if(!tryDig(EAST)) tryDig(SOUTHEAST); break;
+                case SOUTH: if(!tryDig(SOUTH)) tryDig(SOUTHEAST); break;
+                case SOUTHEAST: if(!tryDig(NORTHEAST)) tryDig(SOUTHWEST);  break;
+                case SOUTHWEST: if(!tryDig(NORTHWEST)) tryDig(SOUTHWEST); break;
+            }
+        }
+        else{
+            tryDig(NORTH);
+        }
+    }
+
+    MapLocation randPos() throws GameActionException {
+        MapLocation p1 = new MapLocation(hqLoc.x + 3, hqLoc.y + 3);
+        MapLocation p2 = new MapLocation(hqLoc.x + 3, hqLoc.y + 2);
+        MapLocation p3 = new MapLocation(hqLoc.x + 3, hqLoc.y + 1);
+        MapLocation p4 = new MapLocation(hqLoc.x + 3, hqLoc.y);
+        MapLocation p5 = new MapLocation(hqLoc.x + 3, hqLoc.y - 1);
+        MapLocation p6 = new MapLocation(hqLoc.x + 3, hqLoc.y - 2);
+        MapLocation p7 = new MapLocation(hqLoc.x + 3, hqLoc.y - 3);
+        MapLocation[] wall = {p1, p2, p3, p4, p5, p6, p7};
+        return wall[(int) (Math.random() * wall.length-1)];
+    }
+
+    public void buildSecondWall() throws GameActionException {
+        System.out.println("build second wall" + new MapLocation(hqLoc.x + 3, hqLoc.y + 3));
+        MapLocation p1 = new MapLocation(hqLoc.x + 3, hqLoc.y + 3);
+        MapLocation p2 = new MapLocation(hqLoc.x + 3, hqLoc.y + 2);
+        MapLocation p3 = new MapLocation(hqLoc.x + 3, hqLoc.y + 1);
+        MapLocation p4 = new MapLocation(hqLoc.x + 3, hqLoc.y);
+        MapLocation p5 = new MapLocation(hqLoc.x + 3, hqLoc.y - 1);
+        MapLocation p6 = new MapLocation(hqLoc.x + 3, hqLoc.y - 2);
+        MapLocation p7 = new MapLocation(hqLoc.x + 3, hqLoc.y - 3);
+        MapLocation myLoc = rc.getLocation();
+        boolean flag = false;
+        if(myLoc.equals(p1) || myLoc.equals(p2) || myLoc.equals(p3) || myLoc.equals(p4) || myLoc.equals(p5))
+            flag = true;
+        try {
+            if (!flag && !rc.isLocationOccupied(p1)) {
+                nav.goTo(p1);
+                flag = true;
+            }
+        } catch (Exception e) {
+        }
+        try {
+            if (!flag && !rc.isLocationOccupied(p2)) {
+                nav.goTo(p2);
+                flag = true;
+            }
+        } catch (Exception e) {
+        }
+        try {
+            if (!flag && !rc.isLocationOccupied(p3)) {
+                nav.goTo(p3);
+                flag = true;
+            }
+        } catch (Exception e) {
+        }
+        try {
+            if (!flag && !rc.isLocationOccupied(p4)) {
+                nav.goTo(p4);
+                flag = true;
+            }
+        } catch (Exception e) {
+        }
+        try {
+            if (!flag && !rc.isLocationOccupied(p5)) {
+                nav.goTo(p5);
+                flag = true;
+            }
+        } catch (Exception e) {
+        }
+        tryDig(WEST);
+        tryDig(EAST);
+        tryDig(SOUTH);
+        tryDig(SOUTHEAST);
+        tryDig(SOUTHWEST);
+        tryDig2();
+        if (rc.canDepositDirt(Direction.CENTER))
+            rc.depositDirt(Direction.CENTER);
     }
 
     void whereToGo(){

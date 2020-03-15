@@ -21,7 +21,8 @@ public class Communications {
         "vaporator created",                                // 5
         "Not sorrounded",                                   // 6
         "Has enemy",                                        // 7
-        "water"                                             // 8
+        "water",                                            // 8
+        "second wall"                                       // 9
     };
 
     public Communications(RobotController r) {
@@ -52,6 +53,28 @@ public class Communications {
         return null;
     }
 
+	public void broadcastSecondWall() throws GameActionException {
+            int[] message = new int[7];
+            int bid = getBidValue();
+            message[0] = teamSecret;
+            message[1] = 9;
+            if (rc.canSubmitTransaction(message, bid))
+                rc.submitTransaction(message, bid);
+    }
+
+    public boolean getSecondWall() throws GameActionException {
+        for (int i = 1; i < rc.getRoundNum(); i++){
+            for(Transaction tx : rc.getBlock(i)) {
+                int[] mess = tx.getMessage();
+                if(mess[0] == teamSecret && mess[1] == 9){
+                    System.out.println("start second wall!");
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+	
     public void sendOpponentHQLoc(MapLocation loc) throws GameActionException {
         int[] message = new int[7];
         int bid = getBidValue();
