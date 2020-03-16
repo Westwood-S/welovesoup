@@ -90,6 +90,7 @@ public class Landscaper extends Unit {
     boolean tryDig(Direction dir) throws GameActionException {
         if(rc.canDigDirt(dir) && !rc.isLocationOccupied(rc.adjacentLocation(dir))){
             rc.digDirt(dir);
+            System.out.println("tryDig");
             rc.setIndicatorDot(rc.getLocation().add(dir), 255, 0, 0);
             return true;
         }
@@ -100,43 +101,18 @@ public class Landscaper extends Unit {
     boolean isMoreRoomCloseToHq() throws GameActionException {
         System.out.println(hqLoc);
         ArrayList<RobotInfo> landscapersNextToHQ = new ArrayList<>();
-//        boolean flag = false;
-//        do {
-//            try {
-//                flag = false;
-//                System.out.println("range: " + rc.getLocation().distanceSquaredTo(hqLoc) + "current rad: " + rc.getCurrentSensorRadiusSquared());
                 RobotInfo[] robotInfos = rc.senseNearbyRobots();
                 for(RobotInfo ri : robotInfos) {
                     if(ri.type == RobotType.LANDSCAPER) {
-                        System.out.println("Location COORD: " + ri.getLocation());
                         try {
                             if(ri.location.isAdjacentTo(hqLoc))
                                 landscapersNextToHQ.add(ri);
                         } catch (Exception e) {}
                     }
                 }
-                System.out.println(landscapersNextToHQ.size());
                 if(landscapersNextToHQ.size() != 8)
                     return true;
                 return false;
-//                if (rc.isLocationOccupied(new MapLocation(hqLoc.add(NORTH).x, hqLoc.add(NORTH).y)) &&
-//                        rc.isLocationOccupied(new MapLocation(hqLoc.add(NORTHWEST).x, hqLoc.add(NORTHWEST).y)) &&
-//                        rc.isLocationOccupied(new MapLocation(hqLoc.add(NORTHEAST).x, hqLoc.add(NORTHEAST).y)) &&
-//                        rc.isLocationOccupied(new MapLocation(hqLoc.add(EAST).x, hqLoc.add(EAST).y)) &&
-//                        rc.isLocationOccupied(new MapLocation(hqLoc.add(WEST).x, hqLoc.add(WEST).y)) &&
-//                        rc.isLocationOccupied(new MapLocation(hqLoc.add(SOUTH).x, hqLoc.add(SOUTH).y)) &&
-//                        rc.isLocationOccupied(new MapLocation(hqLoc.add(SOUTHEAST).x, hqLoc.add(SOUTHEAST).y)) &&
-//                        rc.isLocationOccupied(new MapLocation(hqLoc.add(SOUTHWEST).x, hqLoc.add(SOUTHWEST).y))) {
-//                    return false;
-//                }
-//            } catch (GameActionException e) {
-//                System.out.println("exception thwron for isLocationOccupied");
-//                //nav.goTo(hqLoc);
-//                flag = true;
-//                return false;
-//            }
-//        } while (flag == true);
-//        return true;
     }
 
     MapLocation nextToHq() throws GameActionException {
@@ -151,27 +127,27 @@ public class Landscaper extends Unit {
                 nav.goTo(new MapLocation(hqLoc.add(Direction.NORTHEAST).x, hqLoc.add(Direction.NORTHEAST).y));
             }
             if (!rc.isLocationOccupied(new MapLocation(hqLoc.add(NORTHWEST).x, hqLoc.add(NORTHWEST).y))) {
-                nav.goTo(new MapLocation(hqLoc.add(Util.randomDirection()).x, hqLoc.add(Util.randomDirection()).y));
+                //nav.goTo(new MapLocation(hqLoc.add(Util.randomDirection()).x, hqLoc.add(Util.randomDirection()).y));
                 nav.goTo(new MapLocation(hqLoc.add(NORTHWEST).x, hqLoc.add(NORTHWEST).y));
             }
             if (!rc.isLocationOccupied(new MapLocation(hqLoc.add(Direction.EAST).x, hqLoc.add(Direction.EAST).y))) {
-                nav.goTo(new MapLocation(hqLoc.add(Util.randomDirection()).x, hqLoc.add(Util.randomDirection()).y));
+                //nav.goTo(new MapLocation(hqLoc.add(Util.randomDirection()).x, hqLoc.add(Util.randomDirection()).y));
                 nav.goTo(new MapLocation(hqLoc.add(Direction.EAST).x, hqLoc.add(Direction.EAST).y));
             }
             if (!rc.isLocationOccupied(new MapLocation(hqLoc.add(Direction.WEST).x, hqLoc.add(Direction.WEST).y))) {
-                nav.goTo(new MapLocation(hqLoc.add(Util.randomDirection()).x, hqLoc.add(Util.randomDirection()).y));
+                //nav.goTo(new MapLocation(hqLoc.add(Util.randomDirection()).x, hqLoc.add(Util.randomDirection()).y));
                 nav.goTo(new MapLocation(hqLoc.add(Direction.WEST).x, hqLoc.add(Direction.WEST).y));
             }
             if (!rc.isLocationOccupied(new MapLocation(hqLoc.add(Direction.SOUTH).x, hqLoc.add(Direction.SOUTH).y))) {
-                nav.goTo(new MapLocation(hqLoc.add(Util.randomDirection()).x, hqLoc.add(Util.randomDirection()).y));
+                //nav.goTo(new MapLocation(hqLoc.add(Util.randomDirection()).x, hqLoc.add(Util.randomDirection()).y));
                 nav.goTo(new MapLocation(hqLoc.add(Direction.SOUTH).x, hqLoc.add(Direction.SOUTH).y));
             }
             if (!rc.isLocationOccupied(new MapLocation(hqLoc.add(Direction.SOUTHWEST).x, hqLoc.add(Direction.SOUTHWEST).y))) {
-                nav.goTo(new MapLocation(hqLoc.add(Util.randomDirection()).x, hqLoc.add(Util.randomDirection()).y));
+                //nav.goTo(new MapLocation(hqLoc.add(Util.randomDirection()).x, hqLoc.add(Util.randomDirection()).y));
                 nav.goTo(new MapLocation(hqLoc.add(Direction.SOUTHWEST).x, hqLoc.add(Direction.SOUTHWEST).y));
             }
             if (!rc.isLocationOccupied(new MapLocation(hqLoc.add(Direction.SOUTHEAST).x, hqLoc.add(Direction.SOUTHEAST).y))) {
-                nav.goTo(new MapLocation(hqLoc.add(Util.randomDirection()).x, hqLoc.add(Util.randomDirection()).y));
+                //nav.goTo(new MapLocation(hqLoc.add(Util.randomDirection()).x, hqLoc.add(Util.randomDirection()).y));
                 nav.goTo(new MapLocation(hqLoc.add(Direction.SOUTHEAST).x, hqLoc.add(Direction.SOUTHEAST).y));
             }
         } catch (Exception e) {}
@@ -236,7 +212,7 @@ public class Landscaper extends Unit {
         System.out.println("build second wall" + new MapLocation(hqLoc.x + 3, hqLoc.y + 3));
         MapLocation p1 = new MapLocation(hqLoc.x + 3, hqLoc.y + 3);
         MapLocation p2 = new MapLocation(hqLoc.x + 3, hqLoc.y + 2);
-        MapLocation p3 = new MapLocation(hqLoc.x + 3, hqLoc.y + 1);
+        MapLocation p3 = new MapLocation(hqLoc.x + 2, hqLoc.y + 3);
         MapLocation p4 = new MapLocation(hqLoc.x + 3, hqLoc.y);
         MapLocation p5 = new MapLocation(hqLoc.x + 3, hqLoc.y - 1);
         MapLocation p6 = new MapLocation(hqLoc.x + 3, hqLoc.y - 2);
